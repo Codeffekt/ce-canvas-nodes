@@ -1,5 +1,6 @@
 import { DragAction } from "../actions/DragAction";
 import { DragEvent } from "../events/DragEvent";
+import { Canvas } from "./Canvas";
 import { CanvasBlockElt } from "./CanvasBlockElt";
 import { CanvasIds } from "./CanvasIds";
 
@@ -7,7 +8,7 @@ export class CanvasNodeElt {
 
     private blocks: CanvasBlockElt[] = [];
 
-    constructor(private src: HTMLElement) {
+    constructor(private canvas: Canvas, private src: HTMLElement) {
         this.retrieveBlocks();
         this.createActions();
     }
@@ -30,6 +31,6 @@ export class CanvasNodeElt {
     }
 
     private createActions() {
-        new DragAction(this.src, DragEvent.forCanvasNodeElt(this));
+        new DragAction(this.canvas, this.src, DragEvent.forCanvasNodeElt(this));
     }
 }

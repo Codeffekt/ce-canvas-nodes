@@ -5,7 +5,6 @@ import { CE_CANVAS_TRANSFORMED, CustomTransformEvent, TransformEvent } from "../
 import { Style } from "../style";
 import { PathBuilder } from "../SVG";
 import { SVG } from "../SVG/SVG";
-import { CSS } from "../CSS";
 import { BlockId } from "./BlockId";
 import { CanvasBlockElt } from "./CanvasBlockElt";
 import { CanvasIds } from "./CanvasIds";
@@ -46,6 +45,10 @@ export class Canvas {
         return node.getBlockFromId(blockId.blockId);
     }
 
+    getCanvasElt() {
+        return this.root;
+    }
+
     private initRoot() {
         this.initContainerStyle(this.root, this.style);
         this.initSVG(this.root, this.style);
@@ -78,21 +81,15 @@ export class Canvas {
     private buildSVGConnectors() {
         for (let connector of this.connectors) {
             const anchorPair = PathBuilder.findBestAnchorPoints(
+                this,
                 connector.getSrc(),
                 connector.getDst()
-            );
-
-            const sourceAnchor = connector.getSrc().getRightAnchor();
-            const destAnchor = connector.getDst().getRightAnchor();
-            const srcPos = getPositionRelativeToRoot(this.root, sourceAnchor,);
-            const destPos = getPositionRelativeToRoot(this.root, destAnchor);
+            );            
 
             const id = CanvasIds.forConnector(connector);
-            const path = SVG.createPath(
-                // SVG.transformPoint(anchorPair.a, this.transform),
-                // SVG.transformPoint(anchorPair.b, this.transform),
-                srcPos,
-                destPos,
+            const path = SVG.createPath(                
+                anchorPair.a,
+                anchorPair.b,
                 id,
                 this.style);
             this.groupContainer.appendChild(path);
@@ -104,8 +101,7 @@ export class Canvas {
             this.updateConnectors(this.connectors);
         });
         document.addEventListener(CE_CANVAS_TRANSFORMED, (evt: CustomEvent<CustomTransformEvent>) => {
-            this.transform = evt.detail.transform;
-            //CSS.applyTransformOnStyle(this.svgContainer, this.transform);           
+            this.transform = evt.detail.transform;                 
             this.updateConnectors(this.connectors);
         });
     }
@@ -114,7 +110,7 @@ export class Canvas {
         for (let child of Array.from(this.root.children)) {
             if (child instanceof HTMLElement &&
                 child.classList.contains(CanvasIds.getCanvasNodeClassName())) {
-                this.nodes.push(new CanvasNodeElt(child));
+                this.nodes.push(new CanvasNodeElt(this, child));
             }
         }
     }
@@ -123,16 +119,4 @@ export class Canvas {
         new TranslateAction(this.root, TransformEvent.forCanvas(this));
         new ScaleAction(this.root, TransformEvent.forCanvas(this));
     }
-}
-
-function getPositionRelativeToRoot(root, child,) {
-    const rootRect = root.getBoundingClientRect();
-    const childRect = child.getBoundingClientRect();
-
-    const scale = rootRect.width / root.clientWidth;
-
-    const x = (childRect.left - rootRect.left) / scale;
-    const y = (childRect.top - rootRect.top) / scale;
-
-    return { x, y }
 }

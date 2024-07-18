@@ -1,9 +1,10 @@
-import { CanvasBlockElt } from "../canvas";
+import { Canvas, CanvasBlockElt } from "../canvas";
+import { CoordsUtils } from "../utils/CoordsUtils";
 import { SVG, SVGPointPair } from "./SVG";
 
 export class PathBuilder {
 
-    static findBestAnchorPoints(src: CanvasBlockElt, dst: CanvasBlockElt): SVGPointPair {
+    static findBestAnchorPoints(canvas: Canvas, src: CanvasBlockElt, dst: CanvasBlockElt): SVGPointPair {
 
         const srcAnchorLeft = SVG.getCenterPoint(src.getLeftAnchor());
         const srcAnchorRight = SVG.getCenterPoint(src.getRightAnchor());
@@ -23,8 +24,8 @@ export class PathBuilder {
             dstAnchorLeft : dstAnchorRight;
 
         return {
-            a: srcAnchor,
-            b: dstAnchor
+            a: CoordsUtils.getPointPositionInCanvasCoords(canvas, srcAnchor),
+            b: CoordsUtils.getPointPositionInCanvasCoords(canvas, dstAnchor),
         };
     }
 

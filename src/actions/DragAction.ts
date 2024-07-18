@@ -1,4 +1,6 @@
+import { Canvas } from "../canvas";
 import { DragEventProvider } from "../events/DragEvent";
+import { CoordsUtils } from "../utils/CoordsUtils";
 
 export class DragAction {
 
@@ -7,7 +9,11 @@ export class DragAction {
         y: 0
     };
 
-    constructor(private elt: HTMLElement, private evtProvider: DragEventProvider) {
+    constructor(
+        private canvas: Canvas,
+        private elt: HTMLElement,
+        private evtProvider: DragEventProvider
+    ) {
         this.createEventListeners();
     }
 
@@ -19,7 +25,7 @@ export class DragAction {
 
     }
 
-    private onDragMouseDown(event: MouseEvent) {   
+    private onDragMouseDown(event: MouseEvent) {
         this.evtProvider.onElementStartDragging();
         event.preventDefault();
         this.pos.x = event.clientX;
@@ -35,13 +41,13 @@ export class DragAction {
     }
 
     private elementDrag(event: MouseEvent) {
-        event.preventDefault();        
-        const deltaX = this.pos.x - event.clientX;
-        const deltaY = this.pos.y - event.clientY;
+        event.preventDefault();
+        const deltaX = CoordsUtils.applyScale(this.canvas, this.pos.x - event.clientX);
+        const deltaY = CoordsUtils.applyScale(this.canvas, this.pos.y - event.clientY);
         this.pos.x = event.clientX;
         this.pos.y = event.clientY;
         this.elt.style.top = (this.elt.offsetTop - deltaY) + "px";
-        this.elt.style.left = (this.elt.offsetLeft - deltaX) + "px";        
+        this.elt.style.left = (this.elt.offsetLeft - deltaX) + "px";
         this.evtProvider.onElementDragged();
     }
 }
