@@ -28,8 +28,6 @@ export class ScaleAction {
         event.preventDefault();
         
         const dy = event.deltaY;
-
-        console.log("deltaY = ", dy);        
         this.retrieveCurrentTransform();
 
         // var originRec = this.container.getBoundingClientRect();
@@ -41,11 +39,12 @@ export class ScaleAction {
         zoom_target.x = (zoom_point.x - this.transform.translation.tx) / this.transform.scale;
         zoom_target.y = (zoom_point.y - this.transform.translation.ty) / this.transform.scale;
         // console.log('drawer: ', this.drawer);        
+
         this.transform.scale += dy * -0.001;        
         // Restrict scale
         this.transform.scale = Math.min(Math.max(0.125, this.transform.scale), 4);
-        this.transform.translation.tx = -zoom_target.x * this.transform.scale + zoom_point.x
-        this.transform.translation.ty = -zoom_target.y * this.transform.scale + zoom_point.y
+        // this.transform.translation.tx = -zoom_target.x * this.transform.scale + zoom_point.x
+        // this.transform.translation.ty = -zoom_target.y * this.transform.scale + zoom_point.y
         // Apply scale transform
         this.applyTransform();
 

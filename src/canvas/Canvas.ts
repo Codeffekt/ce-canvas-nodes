@@ -76,26 +76,28 @@ export class Canvas {
     }
 
     private buildSVGConnectors() {
-        const rootRect = this.root.getBoundingClientRect();
         for (let connector of this.connectors) {
             const anchorPair = PathBuilder.findBestAnchorPoints(
                 connector.getSrc(),
                 connector.getDst()
-            );  
-            
-            console.log(anchorPair);
-            
+            );
+
+            const sourceAnchor = connector.getSrc().getRightAnchor();
+            const destAnchor = connector.getDst().getRightAnchor();
+            const srcPos = getPositionRelativeToRoot(this.root, sourceAnchor,);
+            const destPos = getPositionRelativeToRoot(this.root, destAnchor);
+
             const id = CanvasIds.forConnector(connector);
             const path = SVG.createPath(
-                SVG.transformPoint(anchorPair.a, this.transform),
-                SVG.transformPoint(anchorPair.b, this.transform),
-                // anchorPair.a,
-                // anchorPair.b,
+                // SVG.transformPoint(anchorPair.a, this.transform),
+                // SVG.transformPoint(anchorPair.b, this.transform),
+                srcPos,
+                destPos,
                 id,
                 this.style);
             this.groupContainer.appendChild(path);
         }
-    }
+    } 
 
     private initEventListeners() {
         document.addEventListener(CE_CANVAS_DRAGGED, () => {
@@ -103,7 +105,7 @@ export class Canvas {
         });
         document.addEventListener(CE_CANVAS_TRANSFORMED, (evt: CustomEvent<CustomTransformEvent>) => {
             this.transform = evt.detail.transform;
-            //CSS.applyTransformOnStyle(this.svgContainer, this.transform);            
+            //CSS.applyTransformOnStyle(this.svgContainer, this.transform);           
             this.updateConnectors(this.connectors);
         });
     }
@@ -121,4 +123,16 @@ export class Canvas {
         new TranslateAction(this.root, TransformEvent.forCanvas(this));
         new ScaleAction(this.root, TransformEvent.forCanvas(this));
     }
+}
+
+function getPositionRelativeToRoot(root, child,) {
+    const rootRect = root.getBoundingClientRect();
+    const childRect = child.getBoundingClientRect();
+
+    const scale = rootRect.width / root.clientWidth;
+
+    const x = (childRect.left - rootRect.left) / scale;
+    const y = (childRect.top - rootRect.top) / scale;
+
+    return { x, y }
 }
