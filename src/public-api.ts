@@ -1,6 +1,8 @@
 export * from './canvas';
 export * from './style';
 export * from './SVG';
-export * from './drag';
+export * from './actions';
 export * from './events';
+export * from './actions';
+export * from './CSS';
 

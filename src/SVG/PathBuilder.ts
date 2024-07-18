@@ -1,44 +1,30 @@
 import { CanvasBlockElt } from "../canvas";
+import { SVG, SVGPointPair } from "./SVG";
 
-export interface AnchorPair {
-    src: HTMLElement;
-    dst: HTMLElement;
-}
+export class PathBuilder {
 
-function getCenterXDistance(a: DOMRect, b: DOMRect) {
-    return Math.abs(((a.left + a.right) / 2.0) - ((b.left + b.right) / 2.0));
-}
+    static findBestAnchorPoints(src: CanvasBlockElt, dst: CanvasBlockElt): SVGPointPair {
 
-export class PathBuilder {    
+        const srcAnchorLeft = SVG.getCenterPoint(src.getLeftAnchor());
+        const srcAnchorRight = SVG.getCenterPoint(src.getRightAnchor());
+        const dstAnchorLeft = SVG.getCenterPoint(dst.getLeftAnchor());
+        const dstAnchorRight = SVG.getCenterPoint(dst.getRightAnchor());
 
-    static findBestAnchorPair(src: CanvasBlockElt, dst: CanvasBlockElt): AnchorPair {
+        const srcPoint = SVG.getCenterPoint(src.nativeElement());
+        const dstPoint = SVG.getCenterPoint(dst.nativeElement());
 
-        const srcAnchorLeft = src.getLeftAnchor();
-        const srcAnchorRight = src.getRightAnchor();
-        const dstAnchorLeft = dst.getLeftAnchor();
-        const dstAnchorRight = dst.getRightAnchor();
 
-        const srcAnchor = getCenterXDistance(
-            srcAnchorRight.getBoundingClientRect(),
-            dst.getBoundingClientRect()
-        ) > getCenterXDistance(
-            srcAnchorLeft.getBoundingClientRect(),
-            dst.getBoundingClientRect()
-        ) ?
+        const srcAnchor = SVG.getXDistance(srcAnchorRight, dstPoint) >
+            SVG.getXDistance(srcAnchorLeft, dstPoint) ?
             srcAnchorLeft : srcAnchorRight;
 
-        const dstAnchor = getCenterXDistance(
-            dstAnchorRight.getBoundingClientRect(),
-            src.getBoundingClientRect(),
-        ) > getCenterXDistance(
-            dstAnchorLeft.getBoundingClientRect(),
-            src.getBoundingClientRect()
-        ) ?
+        const dstAnchor = SVG.getXDistance(dstAnchorRight, srcPoint) >
+            SVG.getXDistance(dstAnchorLeft, srcPoint) ?
             dstAnchorLeft : dstAnchorRight;
 
         return {
-            src: srcAnchor,
-            dst: dstAnchor
+            a: srcAnchor,
+            b: dstAnchor
         };
     }
 

@@ -14,6 +14,10 @@ export class CanvasBlockElt {
         return this.src.id;
     }
 
+    nativeElement() {
+        return this.src;
+    }
+
     getBoundingClientRect() {
         return this.src.getBoundingClientRect();
     }

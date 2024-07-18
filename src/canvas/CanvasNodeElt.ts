@@ -1,4 +1,4 @@
-import { DragAction } from "../drag/DragAction";
+import { DragAction } from "../actions/DragAction";
 import { DragEvent } from "../events/DragEvent";
 import { CanvasBlockElt } from "./CanvasBlockElt";
 import { CanvasIds } from "./CanvasIds";

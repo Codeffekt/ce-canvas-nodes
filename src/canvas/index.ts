@@ -4,4 +4,5 @@ export * from './Connector';
 export * from './CanvasBlockElt';
 export * from './CanvasNodeElt';
 export * from './BlockId';
+export * from './CanvasTransform';
 

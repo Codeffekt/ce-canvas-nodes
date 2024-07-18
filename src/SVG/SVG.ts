@@ -1,9 +1,15 @@
+import { CanvasTransform } from "../canvas";
 import { CanvasIds } from "../canvas/CanvasIds";
 import { Style } from "../style/Style";
 
 export interface SVGPoint {
     x: number;
     y: number;
+}
+
+export interface SVGPointPair {
+    a: SVGPoint;
+    b: SVGPoint;
 }
 
 export class SVG {
@@ -26,13 +32,10 @@ export class SVG {
         }
     }
 
-    static createPath(src: HTMLElement, dst: HTMLElement, id: string, style: Style) {
+    static createPath(frontPoint: SVGPoint, backPoint: SVGPoint, id: string, style: Style) {
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         style.applySVGPathStyle(path);
-        path.setAttributeNS(null, "id", id);
-
-        const frontPoint = this.getCenterPoint(dst);
-        const backPoint = this.getCenterPoint(src);
+        path.setAttributeNS(null, "id", id);        
 
         const isConnectorLeftToRight = frontPoint.x > backPoint.x;
 
@@ -57,10 +60,28 @@ export class SVG {
     }
 
     static getCenterPoint(src: HTMLElement): SVGPoint {
-        const rect = src.getBoundingClientRect();
+        const rect = src.getBoundingClientRect();        
         return {
             x: (rect.left + rect.right) / 2,
             y: (rect.top + rect.bottom) / 2,
+        };
+    }
+
+    static getXDistance(a: SVGPoint, b: SVGPoint) {
+        return Math.abs(a.x - b.x);
+    }
+
+    static translatePointFromRect(point: SVGPoint, rect: DOMRect): SVGPoint {
+        return {
+            x: point.x - rect.x,
+            y: point.y - rect.y
+        };
+    }
+
+    static transformPoint(point: SVGPoint, transform: CanvasTransform): SVGPoint {
+        return {
+            x: point.x*transform.scale - transform.translation.tx,
+            y: point.y*transform.scale - transform.translation.ty,
         };
     }
 }

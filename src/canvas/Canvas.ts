@@ -1,12 +1,16 @@
-import { TranslateAction } from "../drag";
-import { CE_CANVAS_DRAGGED, TranslateEvent } from "../events";
+import { TranslateAction } from "../actions";
+import { ScaleAction } from "../actions/ScaleAction";
+import { CE_CANVAS_DRAGGED } from "../events";
+import { CE_CANVAS_TRANSFORMED, CustomTransformEvent, TransformEvent } from "../events/TransformEvent";
 import { Style } from "../style";
 import { PathBuilder } from "../SVG";
 import { SVG } from "../SVG/SVG";
+import { CSS } from "../CSS";
 import { BlockId } from "./BlockId";
 import { CanvasBlockElt } from "./CanvasBlockElt";
 import { CanvasIds } from "./CanvasIds";
 import { CanvasNodeElt } from "./CanvasNodeElt";
+import { CanvasTransform } from "./CanvasTransform";
 import { Connector } from "./Connector";
 
 export class Canvas {
@@ -16,6 +20,13 @@ export class Canvas {
     private connectors: Connector[] = [];
     private nodes: CanvasNodeElt[] = [];
     private style = new Style();
+    private transform: CanvasTransform = {
+        translation: {
+            tx: 0,
+            ty: 0,
+        },
+        scale: 1,
+    };
 
     constructor(private root: HTMLElement) {
         this.initRoot();
@@ -31,9 +42,9 @@ export class Canvas {
     }
 
     getBlockFromId(blockId: BlockId): CanvasBlockElt {
-        const node = this.nodes.find(elt => elt.id() === blockId.nodeId);        
+        const node = this.nodes.find(elt => elt.id() === blockId.nodeId);
         return node.getBlockFromId(blockId.blockId);
-    }    
+    }
 
     private initRoot() {
         this.initContainerStyle(this.root, this.style);
@@ -65,12 +76,21 @@ export class Canvas {
     }
 
     private buildSVGConnectors() {
+        const rootRect = this.root.getBoundingClientRect();
         for (let connector of this.connectors) {
-            const anchorPair = PathBuilder.findBestAnchorPair(connector.getSrc(), connector.getDst());
+            const anchorPair = PathBuilder.findBestAnchorPoints(
+                connector.getSrc(),
+                connector.getDst()
+            );  
+            
+            console.log(anchorPair);
+            
             const id = CanvasIds.forConnector(connector);
             const path = SVG.createPath(
-                anchorPair.src,
-                anchorPair.dst,
+                SVG.transformPoint(anchorPair.a, this.transform),
+                SVG.transformPoint(anchorPair.b, this.transform),
+                // anchorPair.a,
+                // anchorPair.b,
                 id,
                 this.style);
             this.groupContainer.appendChild(path);
@@ -79,6 +99,11 @@ export class Canvas {
 
     private initEventListeners() {
         document.addEventListener(CE_CANVAS_DRAGGED, () => {
+            this.updateConnectors(this.connectors);
+        });
+        document.addEventListener(CE_CANVAS_TRANSFORMED, (evt: CustomEvent<CustomTransformEvent>) => {
+            this.transform = evt.detail.transform;
+            //CSS.applyTransformOnStyle(this.svgContainer, this.transform);            
             this.updateConnectors(this.connectors);
         });
     }
@@ -93,6 +118,7 @@ export class Canvas {
     }
 
     private createActions() {
-        new TranslateAction(this.root, TranslateEvent.forCanvas(this));
+        new TranslateAction(this.root, TransformEvent.forCanvas(this));
+        new ScaleAction(this.root, TransformEvent.forCanvas(this));
     }
 }
