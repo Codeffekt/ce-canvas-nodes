@@ -4,10 +4,10 @@ import { SVGPoint } from "../SVG";
 export class CoordsUtils {
 
     static getElementCenterPositionInCanvasCoords(canvas: Canvas, elt: HTMLElement): SVGPoint {
-        const canvasEltRect = canvas.getCanvasElt().getBoundingClientRect();
+        const canvasEltRect = canvas.getNodesContainer().getBoundingClientRect();
         const eltRect = elt.getBoundingClientRect();
     
-        const scale = canvasEltRect.width / canvas.getCanvasElt().clientWidth;
+        const scale = canvasEltRect.width / canvas.getNodesContainer().clientWidth;
     
         const left = (eltRect.left - canvasEltRect.left) / scale;
         const top = (eltRect.top - canvasEltRect.top) / scale;
@@ -18,9 +18,9 @@ export class CoordsUtils {
     }
 
     static getPointPositionInCanvasCoords(canvas: Canvas, point: SVGPoint): SVGPoint {
-        const canvasEltRect = canvas.getCanvasElt().getBoundingClientRect();        
+        const canvasEltRect = canvas.getNodesContainer().getBoundingClientRect();        
     
-        const scale = canvasEltRect.width / canvas.getCanvasElt().clientWidth;
+        const scale = canvasEltRect.width / canvas.getNodesContainer().clientWidth;
 
         const x = (point.x - canvasEltRect.left) / scale;
         const y = (point.y - canvasEltRect.top) / scale;        
@@ -29,7 +29,7 @@ export class CoordsUtils {
     }
 
     static applyScale(canvas: Canvas, value: number) {
-        const scale = canvas.getCanvasElt().getBoundingClientRect().width / canvas.getCanvasElt().clientWidth;
+        const scale = canvas.getNodesContainer().getBoundingClientRect().width / canvas.getNodesContainer().clientWidth;
         return value / scale;
     }
 }

@@ -1,4 +1,4 @@
-import { CanvasTransform } from "../canvas";
+import { Canvas, CanvasTransform } from "../canvas";
 import { CSS } from "../CSS";
 import { TransformEventProvider } from "../events/TransformEvent";
 
@@ -24,13 +24,13 @@ export class TranslateAction {
         scale: 1
     }    
 
-    constructor(private elt: HTMLElement, private evtProvider: TransformEventProvider) {
+    constructor(private canvas: Canvas, private evtProvider: TransformEventProvider) {
         this.createEventListeners();
     }
 
     private createEventListeners() {
 
-        this.elt.addEventListener("mousedown", (event: MouseEvent) => {
+        this.canvas.getContainer().addEventListener("mousedown", (event: MouseEvent) => {
             this.onDragMouseDown(event);
         });
     }
@@ -81,10 +81,10 @@ export class TranslateAction {
     }
 
     private applyTransform() {
-        CSS.applyTransformOnStyle(this.elt, this.transform);        
+        CSS.applyTransformOnStyle(this.canvas.getNodesContainer(), this.transform);        
     }
 
     private retrieveCurrentTransform() {
-        CSS.updateTransform(this.elt, this.transform);        
+        CSS.updateTransform(this.canvas.getNodesContainer(), this.transform);        
     }
 }

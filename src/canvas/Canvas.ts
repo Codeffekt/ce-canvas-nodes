@@ -5,6 +5,7 @@ import { CE_CANVAS_TRANSFORMED, CustomTransformEvent, TransformEvent } from "../
 import { Style } from "../style";
 import { PathBuilder } from "../SVG";
 import { SVG } from "../SVG/SVG";
+import { HTMLUtils } from "../utils";
 import { BlockId } from "./BlockId";
 import { CanvasBlockElt } from "./CanvasBlockElt";
 import { CanvasIds } from "./CanvasIds";
@@ -14,6 +15,7 @@ import { Connector } from "./Connector";
 
 export class Canvas {
 
+    private nodesContainer: HTMLElement;
     private svgContainer: SVGElement;
     private groupContainer: SVGElement;
     private connectors: Connector[] = [];
@@ -27,8 +29,8 @@ export class Canvas {
         scale: 1,
     };
 
-    constructor(private root: HTMLElement) {
-        this.initRoot();
+    constructor(private canvasContainer: HTMLElement) {
+        this.initCanvasNodesContainer();
         this.initCanvasNodes();
         this.initEventListeners();
         this.createActions();
@@ -45,16 +47,30 @@ export class Canvas {
         return node.getBlockFromId(blockId.blockId);
     }
 
-    getCanvasElt() {
-        return this.root;
+    getContainer() {
+        return this.canvasContainer;
     }
 
-    private initRoot() {
-        this.initContainerStyle(this.root, this.style);
-        this.initSVG(this.root, this.style);
+    getNodesContainer() {
+        return this.nodesContainer;
     }
 
-    private initContainerStyle(root: HTMLElement, style: Style) {
+    private retrieveNodesContainer() {
+        this.nodesContainer = HTMLUtils.findFirstChildWithClass(
+            this.canvasContainer, 
+            CanvasIds.getCanvasNodesClassName());
+        if(!this.nodesContainer) {
+            throw new Error(`Missing nodes elements with class ${CanvasIds.getCanvasNodesClassName()}`);
+        }
+    }
+
+    private initCanvasNodesContainer() {
+        this.retrieveNodesContainer();
+        this.initContainerNodesStyle(this.nodesContainer, this.style);
+        this.initSVG(this.nodesContainer, this.style);
+    }
+
+    private initContainerNodesStyle(root: HTMLElement, style: Style) {
         style.applyRootStyle(root);
     }
 
@@ -106,8 +122,8 @@ export class Canvas {
         });
     }
 
-    private initCanvasNodes() {
-        for (let child of Array.from(this.root.children)) {
+    private initCanvasNodes() {        
+        for (let child of Array.from(this.nodesContainer.children)) {
             if (child instanceof HTMLElement &&
                 child.classList.contains(CanvasIds.getCanvasNodeClassName())) {
                 this.nodes.push(new CanvasNodeElt(this, child));
@@ -116,7 +132,7 @@ export class Canvas {
     }
 
     private createActions() {
-        new TranslateAction(this.root, TransformEvent.forCanvas(this));
-        new ScaleAction(this.root, TransformEvent.forCanvas(this));
+        new TranslateAction(this, TransformEvent.forCanvas(this));
+        new ScaleAction(this, TransformEvent.forCanvas(this));
     }
 }

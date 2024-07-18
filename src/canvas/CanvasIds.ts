@@ -17,6 +17,10 @@ export class CanvasIds {
         return "right-anchor";
     }
 
+    static getCanvasNodesClassName() {
+        return "canvas-nodes";
+    }
+
     static getCanvasNodeClassName() {
         return "canvas-node-elt";
     }

@@ -1,4 +1,4 @@
-import { CanvasTransform } from "../canvas";
+import { Canvas, CanvasTransform } from "../canvas";
 import { CSS } from "../CSS";
 import { TransformEventProvider } from "../events/TransformEvent";
 
@@ -12,13 +12,13 @@ export class ScaleAction {
         scale: 1,
     };    
 
-    constructor(private elt: HTMLElement, private evtProvider: TransformEventProvider) {
+    constructor(private canvas: Canvas, private evtProvider: TransformEventProvider) {
         this.createEventListeners();
     }
 
     private createEventListeners() {
 
-        this.elt.addEventListener("wheel", (event: WheelEvent) => {
+        this.canvas.getContainer().addEventListener("wheel", (event: WheelEvent) => {
             this.onMouseWheel(event);
         });
     }
@@ -34,8 +34,8 @@ export class ScaleAction {
         // zoom
         const zoom_target = { x: 0, y: 0 }
         const zoom_point = { x: 0, y: 0 }
-        zoom_point.x = event.pageX - this.elt.offsetLeft; // - originRec.x;
-        zoom_point.y = event.pageY - this.elt.offsetTop; // - originRec.y;
+        zoom_point.x = event.pageX - this.canvas.getNodesContainer().offsetLeft; // - originRec.x;
+        zoom_point.y = event.pageY - this.canvas.getNodesContainer().offsetTop; // - originRec.y;
         zoom_target.x = (zoom_point.x - this.transform.translation.tx) / this.transform.scale;
         zoom_target.y = (zoom_point.y - this.transform.translation.ty) / this.transform.scale;
         // console.log('drawer: ', this.drawer);        
@@ -52,10 +52,10 @@ export class ScaleAction {
     }
 
     private applyTransform() {
-        CSS.applyTransformOnStyle(this.elt, this.transform);        
+        CSS.applyTransformOnStyle(this.canvas.getNodesContainer(), this.transform);        
     }
 
     private retrieveCurrentTransform() {
-        CSS.updateTransform(this.elt, this.transform);        
+        CSS.updateTransform(this.canvas.getNodesContainer(), this.transform);        
     }
 }
