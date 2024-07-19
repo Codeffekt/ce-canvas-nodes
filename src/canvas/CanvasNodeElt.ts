@@ -17,6 +17,10 @@ export class CanvasNodeElt {
         return this.src.id;
     }
 
+    getCanvas() {
+        return this.canvas;
+    }
+
     getBlockFromId(id: string) {
         return this.blocks.find(elt => elt.id() === id);
     }
@@ -31,6 +35,6 @@ export class CanvasNodeElt {
     }
 
     private createActions() {
-        new DragAction(this.canvas, this.src, DragEvent.forCanvasNodeElt(this));
+        new DragAction(this.canvas, this.src, DragEvent.forCanvasNodeElt(this));        
     }
 }

@@ -1,3 +1,5 @@
+import { CreateConnectorAction, SelectionAction } from "../actions";
+import { CreateConnectorEvent, SelectionEvent } from "../events";
 import { CanvasIds } from "./CanvasIds";
 import { CanvasNodeElt } from "./CanvasNodeElt";
 
@@ -7,7 +9,8 @@ export class CanvasBlockElt {
     private rightAnchor: HTMLElement;
 
     constructor(private src: HTMLElement, private parent: CanvasNodeElt) {         
-        this.retrieveAnchorsElements();        
+        this.retrieveAnchorsElements();
+        this.createActions();
     }
     
     id() {
@@ -16,6 +19,10 @@ export class CanvasBlockElt {
 
     nativeElement() {
         return this.src;
+    }
+
+    node() {
+        return this.parent;
     }
 
     getBoundingClientRect() {
@@ -30,6 +37,10 @@ export class CanvasBlockElt {
         return this.rightAnchor;
     }
     
+    getAnchors() {
+        return [this.leftAnchor, this.rightAnchor];
+    }
+
     private retrieveAnchorsElements() {
         for (let child of Array.from(this.src.children)) {
             if(child.id === CanvasIds.getLeftAnchorId()) {
@@ -41,5 +52,10 @@ export class CanvasBlockElt {
         if(!this.leftAnchor || !this.rightAnchor) {
             throw new Error("Missing left or right anchor ids");
         }
+    }
+
+    private createActions() {
+        new CreateConnectorAction(this, CreateConnectorEvent.forCanvasBlockElt(this));
+        new SelectionAction(this.src, SelectionEvent.forCanvasBlock(this));
     }
 }

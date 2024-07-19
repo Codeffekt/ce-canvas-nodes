@@ -37,6 +37,14 @@ export class CanvasIds {
         return `connector/${connector.getSrcId()}/${connector.getDstId()}`;
     }
 
+    static forDraftGroup() {
+        return "canvas-draft-group";
+    }
+
+    static forConnectorDraft() {
+        return "canvas-connector-draft";
+    }
+
     static forArrowType(type: string) {
         return arrow_ids[type];
     }

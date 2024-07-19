@@ -1,6 +1,6 @@
 import { TranslateAction } from "../actions";
 import { ScaleAction } from "../actions/ScaleAction";
-import { CE_CANVAS_DRAGGED } from "../events";
+import { CE_CANVAS_CREATE_CONNECTOR_END, CE_CANVAS_DRAGGED, CustomCreateConnectorEvent } from "../events";
 import { CE_CANVAS_TRANSFORMED, CustomTransformEvent, TransformEvent } from "../events/TransformEvent";
 import { Style } from "../style";
 import { PathBuilder } from "../SVG";
@@ -17,7 +17,7 @@ export class Canvas {
 
     private nodesContainer: HTMLElement;
     private svgContainer: SVGElement;
-    private groupContainer: SVGElement;
+    private connectorsContainer: SVGElement;
     private connectors: Connector[] = [];
     private nodes: CanvasNodeElt[] = [];
     private style = new Style();
@@ -36,9 +36,9 @@ export class Canvas {
         this.createActions();
     }
 
-    updateConnectors(connectors: Connector[]) {
+    updateConnectors(connectors: Connector[]) {        
+        this.clearSVGConnectors();
         this.connectors = connectors;
-        this.clearSVG();
         this.buildSVGConnectors();
     }
 
@@ -55,11 +55,19 @@ export class Canvas {
         return this.nodesContainer;
     }
 
+    getSVGContainer() {
+        return this.svgContainer;
+    }
+
+    getStyle() {
+        return this.style;
+    }
+
     private retrieveNodesContainer() {
         this.nodesContainer = HTMLUtils.findFirstChildWithClass(
-            this.canvasContainer, 
+            this.canvasContainer,
             CanvasIds.getCanvasNodesClassName());
-        if(!this.nodesContainer) {
+        if (!this.nodesContainer) {
             throw new Error(`Missing nodes elements with class ${CanvasIds.getCanvasNodesClassName()}`);
         }
     }
@@ -82,16 +90,16 @@ export class Canvas {
             defsElement.appendChild(marker);
         }
         container.appendChild(defsElement);
-        const groupElement = style.createGroupElement();
+        const groupElement = style.createConnectorsGroupElement();
         container.appendChild(groupElement);
         root.appendChild(container);
 
         this.svgContainer = container;
-        this.groupContainer = groupElement;
+        this.connectorsContainer = groupElement;
     }
 
-    private clearSVG() {
-        SVG.clearPaths(this.groupContainer);
+    private clearSVGConnectors() {
+        SVG.clearPaths(this.connectorsContainer);
     }
 
     private buildSVGConnectors() {
@@ -100,29 +108,37 @@ export class Canvas {
                 this,
                 connector.getSrc(),
                 connector.getDst()
-            );            
+            );
 
             const id = CanvasIds.forConnector(connector);
-            const path = SVG.createPath(                
+            const path = SVG.createPath(
                 anchorPair.a,
                 anchorPair.b,
                 id,
                 this.style);
-            this.groupContainer.appendChild(path);
+            this.connectorsContainer.appendChild(path);
         }
-    } 
+    }
 
     private initEventListeners() {
         document.addEventListener(CE_CANVAS_DRAGGED, () => {
             this.updateConnectors(this.connectors);
         });
-        document.addEventListener(CE_CANVAS_TRANSFORMED, (evt: CustomEvent<CustomTransformEvent>) => {
-            this.transform = evt.detail.transform;                 
-            this.updateConnectors(this.connectors);
-        });
+        document.addEventListener(CE_CANVAS_TRANSFORMED,
+            (evt: CustomEvent<CustomTransformEvent>) => {
+                this.transform = evt.detail.transform;
+                this.updateConnectors(this.connectors);
+            });
+        document.addEventListener(CE_CANVAS_CREATE_CONNECTOR_END,
+            (evt: CustomEvent<CustomCreateConnectorEvent>) => {
+                if (evt.detail.connector) {
+                    this.connectors.push(evt.detail.connector);
+                    this.updateConnectors(this.connectors);
+                }
+            });
     }
 
-    private initCanvasNodes() {        
+    private initCanvasNodes() {
         for (let child of Array.from(this.nodesContainer.children)) {
             if (child instanceof HTMLElement &&
                 child.classList.contains(CanvasIds.getCanvasNodeClassName())) {

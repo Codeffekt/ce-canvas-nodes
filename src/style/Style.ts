@@ -47,9 +47,18 @@ export class Style {
             .map(markerElementStyle => MarkerElement.createElementFromStyle(markerElementStyle));
     }
 
-    createGroupElement() {
+    createConnectorsGroupElement() {
         return GroupElement.createElementFromStyle({
             id: this.getSVGConnectorsId(),
+            fill: "white",
+            stroke: "black",
+            "stroke-width": "2",
+        });
+    }
+
+    createDraftGroupElement() {
+        return GroupElement.createElementFromStyle({
+            id: CanvasIds.forDraftGroup(),
             fill: "white",
             stroke: "black",
             "stroke-width": "2",

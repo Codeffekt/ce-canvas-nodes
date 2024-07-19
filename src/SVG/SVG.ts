@@ -26,17 +26,21 @@ export class SVG {
     }
 
     static clearPaths(svgElement: SVGElement) {
-        const paths = svgElement.getElementsByTagNameNS("http://www.w3.org/2000/svg", "path");
-        for (let i = 0; i < paths.length; ++i) {
-            svgElement.removeChild(paths[i]);
-        }
+        while (svgElement.firstElementChild) {
+            svgElement.firstElementChild.remove();
+        }        
     }
 
     static createPath(frontPoint: SVGPoint, backPoint: SVGPoint, id: string, style: Style) {
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         style.applySVGPathStyle(path);
-        path.setAttributeNS(null, "id", id);        
+        path.setAttributeNS(null, "id", id);
+        this.updatePath(path, frontPoint, backPoint);
+        path.setAttributeNS(null, "marker-start", "url(#" + CanvasIds.forArrowType('arrow') + ")");
+        return path;
+    }
 
+    static updatePath(path: SVGPathElement, frontPoint: SVGPoint, backPoint: SVGPoint) {
         const isConnectorLeftToRight = frontPoint.x > backPoint.x;
 
         const delta = isConnectorLeftToRight ? -200 : 200;
@@ -54,13 +58,10 @@ export class SVG {
 
         const d = "M" + (frontPoint.x + deltaArrow) + " " + frontPoint.y + " " + "C " + controlFront.x + " " + controlFront.y + " " + controlBack.x + " " + controlBack.y + " " + backPoint.x + " " + backPoint.y;
         path.setAttributeNS(null, "d", d);
-        path.setAttributeNS(null, "marker-start", "url(#" + CanvasIds.forArrowType('arrow') + ")");
-
-        return path;
     }
 
     static getCenterPoint(src: HTMLElement): SVGPoint {
-        const rect = src.getBoundingClientRect();        
+        const rect = src.getBoundingClientRect();
         return {
             x: (rect.left + rect.right) / 2,
             y: (rect.top + rect.bottom) / 2,
@@ -80,8 +81,8 @@ export class SVG {
 
     static transformPoint(point: SVGPoint, transform: CanvasTransform): SVGPoint {
         return {
-            x: point.x*transform.scale - transform.translation.tx,
-            y: point.y*transform.scale - transform.translation.ty,
+            x: point.x * transform.scale - transform.translation.tx,
+            y: point.y * transform.scale - transform.translation.ty,
         };
     }
 }

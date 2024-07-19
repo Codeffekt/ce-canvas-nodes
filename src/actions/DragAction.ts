@@ -25,7 +25,7 @@ export class DragAction {
 
     }
 
-    private onDragMouseDown(event: MouseEvent) {
+    private onDragMouseDown(event: MouseEvent) {        
         this.evtProvider.onElementStartDragging();
         event.preventDefault();
         this.pos.x = event.clientX;
