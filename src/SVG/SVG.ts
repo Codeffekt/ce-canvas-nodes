@@ -35,7 +35,7 @@ export class SVG {
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         style.applySVGPathStyle(path);
         path.setAttributeNS(null, "id", id);
-        this.updatePath(path, frontPoint, backPoint);
+        this.updatePath(path, backPoint, frontPoint);
         path.setAttributeNS(null, "marker-start", "url(#" + CanvasIds.forArrowType('arrow') + ")");
         return path;
     }
