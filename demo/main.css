@@ -52,7 +52,7 @@ body {
     justify-content: space-between;
 }
 
-.canvas-left-anchor {
+#canvas-left-anchor {
     position: relative;
     left: -5px;
     top: 50%;
@@ -61,7 +61,7 @@ body {
     background-color: blue;
 }
 
-.canvas-right-anchor {
+#canvas-right-anchor {
     position: relative;
     right: -5px;
     top: 50%;

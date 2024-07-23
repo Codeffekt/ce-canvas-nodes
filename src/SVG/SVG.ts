@@ -31,7 +31,7 @@ export class SVG {
         }        
     }
 
-    static createPath(frontPoint: SVGPoint, backPoint: SVGPoint, id: string, style: Style) {
+    static createPath(backPoint: SVGPoint, frontPoint: SVGPoint, id: string, style: Style) {
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         style.applySVGPathStyle(path);
         path.setAttributeNS(null, "id", id);
@@ -40,7 +40,7 @@ export class SVG {
         return path;
     }
 
-    static updatePath(path: SVGPathElement, frontPoint: SVGPoint, backPoint: SVGPoint) {
+    static updatePath(path: SVGPathElement, backPoint: SVGPoint, frontPoint: SVGPoint) {
         const isConnectorLeftToRight = frontPoint.x > backPoint.x;
 
         const delta = isConnectorLeftToRight ? -200 : 200;

@@ -1,13 +1,11 @@
 import { CreateConnectorAction, SelectionAction } from "../actions";
 import { CreateConnectorEvent, SelectionEvent } from "../events";
-import { HTMLUtils } from "../utils";
 import { CanvasIds } from "./CanvasIds";
 import { CanvasNodeElt } from "./CanvasNodeElt";
 
 export class CanvasBlockElt {
-    
-    private leftAnchor: HTMLElement;
-    private rightAnchor: HTMLElement;
+        
+    private anchors: HTMLElement[] = [];
 
     constructor(private src: HTMLElement, private parent: CanvasNodeElt) {         
         this.retrieveAnchorsElements();
@@ -28,27 +26,17 @@ export class CanvasBlockElt {
 
     getBoundingClientRect() {
         return this.src.getBoundingClientRect();
-    }
-
-    getLeftAnchor() {
-        return this.leftAnchor;
-    }
-
-    getRightAnchor() {
-        return this.rightAnchor;
-    }
+    }    
     
     getAnchors() {
-        return [this.leftAnchor, this.rightAnchor];
+        return this.anchors;
     }
 
     private retrieveAnchorsElements() {
+        this.anchors = Array.from(this.src.getElementsByClassName(CanvasIds.getAnchorClassName())) as HTMLElement[];    
 
-        this.leftAnchor = HTMLUtils.findFirstChildWithClass(this.src, CanvasIds.getLeftAnchorClassName());
-        this.rightAnchor = HTMLUtils.findFirstChildWithClass(this.src, CanvasIds.getRightAnchorClassName());
-
-        if(!this.leftAnchor || !this.rightAnchor) {
-            throw new Error("Missing left or right anchor ids");
+        if(!this.anchors.length) {
+            throw new Error(`The block ${this.src.id} has no anchor element`);
         }
     }
 
