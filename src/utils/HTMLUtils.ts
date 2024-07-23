@@ -1,12 +1,8 @@
 export class HTMLUtils {
 
     static findFirstChildWithClass(root: HTMLElement, className: string): HTMLElement|null {
-        for (let child of Array.from(root.children)) {
-            if (child.classList.contains(className)) {
-                return child as HTMLElement;
-            }
-            return null;
-        }
+        const elements = root.getElementsByClassName(className);
+        return elements.length && elements[0] instanceof HTMLElement ? elements[0] : null;
     }
 
 }

@@ -25,16 +25,19 @@ export class CanvasNodeElt {
         return this.blocks.find(elt => elt.id() === id);
     }
 
+    getElement() {
+        return this.src;
+    }
+
     private retrieveBlocks() {
-        for (let child of Array.from(this.src.children)) {
-            if (child instanceof HTMLElement &&
-                child.classList.contains(CanvasIds.getCanvasBlockClassName())) {
+        for (let child of Array.from(this.src.getElementsByClassName(CanvasIds.getCanvasBlockClassName()))) {
+            if (child instanceof HTMLElement) {
                 this.blocks.push(new CanvasBlockElt(child, this));
             }
         }
     }
 
     private createActions() {
-        new DragAction(this.canvas, this.src, DragEvent.forCanvasNodeElt(this));        
+        new DragAction(this.canvas, this.src, DragEvent.forCanvasNodeElt(this));
     }
 }

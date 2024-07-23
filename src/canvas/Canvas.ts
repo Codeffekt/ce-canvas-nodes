@@ -36,6 +36,35 @@ export class Canvas {
         this.createActions();
     }
 
+    addNodeFromElement(elt: HTMLElement) {
+        const node = new CanvasNodeElt(this, elt);
+        this.nodes.push(node);
+        this.updateConnectors(this.connectors);
+        return node;
+    }
+
+    getNodes() {
+        return this.nodes;
+    }
+
+    getNodeFromElementId(id: string) {
+        return this.nodes.find(node => node.id() === id);
+    }
+
+    removeNode(node: CanvasNodeElt) {        
+        this.nodes = this.nodes.filter(elt => elt !== node);
+        this.connectors = this.connectors.filter(
+            connector => connector.getSrc().node() !== node && connector.getDst().node() !== node);
+        this.updateConnectors(this.connectors);
+    }
+
+    removeNodeFromElement(elt: HTMLElement) {
+        const node = this.nodes.find(node => node.getElement() === elt);
+        if(node) {
+            this.removeNode(node);
+        }
+    }
+
     updateConnectors(connectors: Connector[]) {        
         this.clearSVGConnectors();
         this.connectors = connectors;
@@ -139,9 +168,8 @@ export class Canvas {
     }
 
     private initCanvasNodes() {
-        for (let child of Array.from(this.nodesContainer.children)) {
-            if (child instanceof HTMLElement &&
-                child.classList.contains(CanvasIds.getCanvasNodeClassName())) {
+        for (let child of Array.from(this.nodesContainer.getElementsByClassName(CanvasIds.getCanvasNodeClassName()))) {
+            if (child instanceof HTMLElement) {
                 this.nodes.push(new CanvasNodeElt(this, child));
             }
         }

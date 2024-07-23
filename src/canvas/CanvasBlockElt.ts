@@ -1,5 +1,6 @@
 import { CreateConnectorAction, SelectionAction } from "../actions";
 import { CreateConnectorEvent, SelectionEvent } from "../events";
+import { HTMLUtils } from "../utils";
 import { CanvasIds } from "./CanvasIds";
 import { CanvasNodeElt } from "./CanvasNodeElt";
 
@@ -42,13 +43,10 @@ export class CanvasBlockElt {
     }
 
     private retrieveAnchorsElements() {
-        for (let child of Array.from(this.src.children)) {
-            if(child.id === CanvasIds.getLeftAnchorId()) {
-                this.leftAnchor = child as HTMLElement;
-            } else if(child.id === CanvasIds.getRightAnchorId()) {
-                this.rightAnchor = child as HTMLElement;
-            }
-        }
+
+        this.leftAnchor = HTMLUtils.findFirstChildWithClass(this.src, CanvasIds.getLeftAnchorClassName());
+        this.rightAnchor = HTMLUtils.findFirstChildWithClass(this.src, CanvasIds.getRightAnchorClassName());
+
         if(!this.leftAnchor || !this.rightAnchor) {
             throw new Error("Missing left or right anchor ids");
         }
