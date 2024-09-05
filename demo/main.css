@@ -3,6 +3,16 @@ body {
     padding: 0;    
 }
 
+#buttons {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: white;
+    margin-left: 20px;
+    margin-top: 10px;
+    z-index: 1;
+}
+
 .canvas {
     position: absolute;
     left: 0;
@@ -80,6 +90,11 @@ body {
     left: 400px;
     top: 400px;
     background-color: red;
+}
+
+#elt3 {
+    left: 50px;
+    top: 50px;
 }
 
 #header {

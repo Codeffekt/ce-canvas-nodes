@@ -6,4 +6,5 @@ export * from './events';
 export * from './actions';
 export * from './CSS';
 export * from './utils';
+export * from './auto-layout';
 

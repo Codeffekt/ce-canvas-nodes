@@ -1,5 +1,6 @@
 import { TranslateAction } from "../actions";
 import { ScaleAction } from "../actions/ScaleAction";
+import { AutoLayout } from "../auto-layout";
 import { CE_CANVAS_CREATE_CONNECTOR_END, CE_CANVAS_DRAGGED, CustomCreateConnectorEvent } from "../events";
 import { CE_CANVAS_TRANSFORMED, CustomTransformEvent, TransformEvent } from "../events/TransformEvent";
 import { Style } from "../style";
@@ -90,6 +91,11 @@ export class Canvas {
 
     getStyle() {
         return this.style;
+    }
+
+    applyAutoLayout(autoLayout: AutoLayout) {
+        autoLayout.autoLayout(this.nodes);
+        this.updateConnectors(this.connectors);
     }
 
     private retrieveNodesContainer() {

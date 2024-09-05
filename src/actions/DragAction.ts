@@ -1,6 +1,7 @@
 import { Canvas } from "../canvas";
 import { DragEventProvider } from "../events/DragEvent";
 import { CoordsUtils } from "../utils/CoordsUtils";
+import { CSS } from "../CSS";
 
 export class DragAction {
 
@@ -46,8 +47,11 @@ export class DragAction {
         const deltaY = CoordsUtils.applyScale(this.canvas, this.pos.y - event.clientY);
         this.pos.x = event.clientX;
         this.pos.y = event.clientY;
-        this.elt.style.top = (this.elt.offsetTop - deltaY) + "px";
-        this.elt.style.left = (this.elt.offsetLeft - deltaX) + "px";
+        CSS.setEltUpperLeftPos(
+            this.elt,  
+            (this.elt.offsetLeft - deltaX), 
+            (this.elt.offsetTop - deltaY)
+        );        
         this.evtProvider.onElementDragged();
     }
 }

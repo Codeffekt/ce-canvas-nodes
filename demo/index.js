@@ -1,4 +1,10 @@
-import { Canvas, Connector } from '../dist/ce-canvas-nodes.esm.js';
+import { Canvas, Connector, SingleRowAutoLayout } from '../dist/ce-canvas-nodes.esm.js';
+
+var canvas = undefined;
+
+export default function applyAutoLayout() {
+    canvas.applyAutoLayout(new SingleRowAutoLayout());
+}
 
 function bootstrap() {
 
@@ -8,7 +14,7 @@ function bootstrap() {
         throw new Error("Missing container with canvas id");
     }
 
-    const canvas = new Canvas(root);
+    canvas = new Canvas(root);
     canvas.updateConnectors([
         Connector.fromElementsId(canvas, {
             nodeId: "elt1",
@@ -17,7 +23,9 @@ function bootstrap() {
             nodeId: "elt2",
             blockId: "block1"
         })
-    ]);
+    ]);  
+    
+    document.querySelector('#autoLayout').addEventListener('click', applyAutoLayout)
 }
 
 bootstrap();

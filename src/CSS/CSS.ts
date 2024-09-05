@@ -25,4 +25,8 @@ export class CSS {
         }
     }
 
+    static setEltUpperLeftPos(elt: HTMLElement, left: number, top: number, unit: string = "px") {
+        elt.style.top = top + "px";
+        elt.style.left = left + "px";
+    }
 }
