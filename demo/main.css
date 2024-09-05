@@ -1,0 +1,114 @@
+body {
+    margin: 0;
+    padding: 0;    
+}
+
+#buttons {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: white;
+    margin-left: 20px;
+    margin-top: 10px;
+    z-index: 1;
+}
+
+.canvas {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    background: 
+    linear-gradient(45deg, 
+    #eee 25%, 
+    transparent 25%, 
+    transparent 75%, 
+    #eee 75%, 
+    #eee), 
+    linear-gradient(45deg, 
+    #eee 25%, 
+    transparent 25%, 
+    transparent 75%, 
+    #eee 75%, 
+    #eee);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+}
+
+.canvas-nodes {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.canvas-node-elt {
+    display: block;
+    position: absolute;
+    width: 200px;    
+    display: flex;
+    flex-direction: column;
+}
+
+.canvas-block-elt {
+    width: 100%;
+    height: 40px;
+    flex: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#canvas-left-anchor {
+    position: relative;
+    left: -5px;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    background-color: blue;
+}
+
+#canvas-right-anchor {
+    position: relative;
+    right: -5px;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    background-color: blue;
+}
+
+#elt1 {
+    left: 150px;
+    top: 150px;
+    background-color: gray;
+}
+
+#elt2 {
+    left: 400px;
+    top: 400px;
+    background-color: red;
+}
+
+#elt3 {
+    left: 50px;
+    top: 50px;
+}
+
+#header {
+    background-color: green;
+}
+
+#block1 {
+    background-color: aquamarine;
+}
+
+#block2 {
+    background-color: blanchedalmond;
+}
+
+#block3 {
+    background-color: blueviolet;
+}
