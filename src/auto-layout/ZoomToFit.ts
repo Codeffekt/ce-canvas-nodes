@@ -31,7 +31,7 @@ export class ZoomToFit implements AutoLayout {
 
         const containerBox = canvas.getContainer().getBoundingClientRect();        
 
-        const wantedRatio = 0.8;
+        const wantedRatio = this.config.wantedRatio;
         const wantedWidth = Math.floor((containerBox.right - containerBox.left) * wantedRatio);
         const wantedHeight = Math.floor((containerBox.bottom - containerBox.top) * wantedRatio);                
         
