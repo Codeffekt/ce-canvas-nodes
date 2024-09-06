@@ -1,48 +1,52 @@
-import { Canvas, CanvasNodeElt, CanvasTransform } from "../canvas";
+import { Canvas, CanvasTransform } from "../canvas";
 import { CSS } from "../CSS";
 import { TransformEvent } from "../events";
 import { AutoLayout } from "./AutoLayout";
+import { CenterElts } from "./CenterElts";
+import { AutoLayoutUtils } from "./utils";
 
-interface BBox {
-    top: number;
-    left: number;   
-    width: number;
-    height: number;
+export interface ZoomToFitConfig {
+    wantedRatio: number;
 }
 
 export class ZoomToFit implements AutoLayout {
 
-    constructor() {}
+    constructor(private config: ZoomToFitConfig = { wantedRatio: 0.8 }) {}
 
-    autoLayout(canvas: Canvas) {
-        
+    autoLayout(canvas: Canvas) {        
+        this.zoomElts(canvas);
+        canvas.applyAutoLayout(new CenterElts());
+    }
+
+    private zoomElts(canvas: Canvas) {
         const nodes = canvas.getNodes();
 
         if(!nodes.length) {
             return;
         }
 
-        const bbox = this.computeNodesBBox(nodes);
+        const bbox = AutoLayoutUtils.computeNodesBBox(nodes);       
 
-        const transform = this.retrieveCurrentTransform(canvas);
+        const transform = this.retrieveCurrentTransform(canvas);        
 
-        console.log(transform);
+        const containerBox = canvas.getContainer().getBoundingClientRect();        
 
-        const bboxCenter = {
-            x: (bbox.left + bbox.width) / 2,
-            y: (bbox.top + bbox.height) / 2
-        };
+        const wantedRatio = 0.8;
+        const wantedWidth = Math.floor((containerBox.right - containerBox.left) * wantedRatio);
+        const wantedHeight = Math.floor((containerBox.bottom - containerBox.top) * wantedRatio);                
+        
+        const curWidth = (bbox.right - bbox.left) / transform.scale;
+        const curHeight = (bbox.bottom - bbox.top) / transform.scale;
+        
+        const wantedScale =  curWidth > curHeight ? wantedWidth / curWidth : wantedHeight / curHeight;                     
 
-        console.log(bboxCenter);
-
-        transform.translation.tx = 0; // bboxCenter.x;
-        transform.translation.ty = 0; // bboxCenter.y;
+        transform.scale = wantedScale;
 
         this.applyTransform(canvas, transform);
 
         const provider = TransformEvent.forCanvas(canvas);
         provider.onElementTransform(transform);
-    }
+    }   
 
     private retrieveCurrentTransform(canvas: Canvas) {
         return CSS.updateTransform(canvas.getNodesContainer());        
@@ -52,28 +56,4 @@ export class ZoomToFit implements AutoLayout {
         CSS.applyTransformOnStyle(canvas.getNodesContainer(), transform);        
     }
 
-    private computeNodesBBox(nodes: CanvasNodeElt[]): BBox {
-
-        if(!nodes.length) {
-            throw new Error("Empty nodes list");
-        }
-
-        const firstElt = nodes[0].getElement();
-        const bbox = {
-            left: firstElt.offsetLeft,
-            top: firstElt.offsetTop,
-            width: firstElt.offsetWidth,
-            height: firstElt.offsetHeight,
-        };
-
-        for(let i = 1; i < nodes.length; ++i) {
-            const curElt = nodes[i].getElement();
-            bbox.left = Math.min(bbox.left, curElt.offsetLeft);
-            bbox.top = Math.min(bbox.top, curElt.offsetTop);
-            bbox.width = Math.max(bbox.left + bbox.width, curElt.offsetWidth + curElt.offsetWidth) - bbox.left;
-            bbox.height = Math.max(bbox.top + bbox.height, curElt.offsetTop + curElt.offsetHeight) - bbox.top;
-        }
-
-        return bbox;
-    }
 }
