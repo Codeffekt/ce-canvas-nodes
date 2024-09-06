@@ -1,7 +1,7 @@
 import { TranslateAction } from "../actions";
 import { ScaleAction } from "../actions/ScaleAction";
 import { AutoLayout } from "../auto-layout";
-import { CE_CANVAS_CREATE_CONNECTOR_END, CE_CANVAS_DRAGGED, CustomCreateConnectorEvent } from "../events";
+import { CE_CANVAS_CREATE_CONNECTOR_END, CE_CANVAS_DRAGGED, CE_CANVAS_UPDATE_CONNECTORS, CustomCreateConnectorEvent, CustomUpdateConnectorsEvent } from "../events";
 import { CE_CANVAS_TRANSFORMED, CustomTransformEvent, TransformEvent } from "../events/TransformEvent";
 import { Style } from "../style";
 import { PathBuilder } from "../SVG";
@@ -94,8 +94,7 @@ export class Canvas {
     }
 
     applyAutoLayout(autoLayout: AutoLayout) {
-        autoLayout.autoLayout(this.nodes);
-        this.updateConnectors(this.connectors);
+        autoLayout.autoLayout(this);        
     }
 
     private retrieveNodesContainer() {
@@ -160,7 +159,7 @@ export class Canvas {
             this.updateConnectors(this.connectors);
         });
         document.addEventListener(CE_CANVAS_TRANSFORMED,
-            (evt: CustomEvent<CustomTransformEvent>) => {
+            (evt: CustomEvent<CustomTransformEvent>) => {                
                 this.transform = evt.detail.transform;
                 this.updateConnectors(this.connectors);
             });
@@ -171,6 +170,10 @@ export class Canvas {
                     this.updateConnectors(this.connectors);
                 }
             });
+        document.addEventListener(CE_CANVAS_UPDATE_CONNECTORS,
+            (evt: CustomEvent<CustomUpdateConnectorsEvent>) => {
+                this.updateConnectors(this.connectors);
+            });        
     }
 
     private initCanvasNodes() {

@@ -1,5 +1,5 @@
-import { CanvasNodeElt } from "../canvas";
+import { Canvas } from "../canvas";
 
 export interface AutoLayout {
-    autoLayout(nodex: CanvasNodeElt[]);
+    autoLayout(canvas: Canvas);
 }

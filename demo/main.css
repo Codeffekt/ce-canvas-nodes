@@ -14,6 +14,7 @@ body {
 }
 
 .canvas {
+    overflow: hidden;
     position: absolute;
     left: 0;
     right: 0;
@@ -42,7 +43,7 @@ body {
     left: 0;
     right: 0;
     top: 0;
-    bottom: 0;
+    bottom: 0;    
 }
 
 .canvas-node-elt {
@@ -81,7 +82,7 @@ body {
 }
 
 #elt1 {
-    left: 150px;
+    left: 100px;
     top: 150px;
     background-color: gray;
 }
@@ -93,8 +94,9 @@ body {
 }
 
 #elt3 {
-    left: 50px;
-    top: 50px;
+    left: 600px;
+    top: 150px;
+    background-color: yellow;
 }
 
 #header {

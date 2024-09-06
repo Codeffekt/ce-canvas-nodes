@@ -1,9 +1,11 @@
-import { Canvas, Connector, SingleRowAutoLayout } from '../dist/ce-canvas-nodes.esm.js';
+import { Canvas, Connector, SingleRowAutoLayout, ZoomToFit } from '../dist/ce-canvas-nodes.esm.js';
 
-var canvas = undefined;
-
-export default function applyAutoLayout() {
+function applyAutoLayout(canvas) {
     canvas.applyAutoLayout(new SingleRowAutoLayout());
+}
+
+function zoomToFit(canvas) {
+    canvas.applyAutoLayout(new ZoomToFit());
 }
 
 function bootstrap() {
@@ -14,7 +16,7 @@ function bootstrap() {
         throw new Error("Missing container with canvas id");
     }
 
-    canvas = new Canvas(root);
+    const canvas = new Canvas(root);
     canvas.updateConnectors([
         Connector.fromElementsId(canvas, {
             nodeId: "elt1",
@@ -25,7 +27,8 @@ function bootstrap() {
         })
     ]);  
     
-    document.querySelector('#autoLayout').addEventListener('click', applyAutoLayout)
+    document.querySelector('#autoLayout').addEventListener('click', () => applyAutoLayout(canvas));
+    document.querySelector('#zoomToFit').addEventListener('click', () => zoomToFit(canvas));
 }
 
 bootstrap();
