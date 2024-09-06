@@ -93,8 +93,9 @@ body {
 }
 
 #elt3 {
-    left: 50px;
-    top: 50px;
+    left: 850px;
+    top: 150px;
+    background-color: yellow;
 }
 
 #header {

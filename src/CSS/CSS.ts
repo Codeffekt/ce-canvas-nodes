@@ -9,7 +9,16 @@ export class CSS {
         elt.style.transform = cmd;
     }
 
-    static updateTransform(elt: HTMLElement|SVGElement, transform: CanvasTransform) {
+    static updateTransform(elt: HTMLElement|SVGElement, src?: CanvasTransform) {
+
+        const transform = src ?? {
+            translation: {
+                tx: 0.0,
+                ty: 0.0,
+            },
+            scale: 1.0,
+        };
+
         if (window.getComputedStyle(elt)) {
             const computedStyle = window.getComputedStyle(elt);
             const transformValue = computedStyle.getPropertyValue('transform');
@@ -23,6 +32,8 @@ export class CSS {
                 transform.scale = scaleX;
             }
         }
+
+        return transform;
     }
 
     static setEltUpperLeftPos(elt: HTMLElement, left: number, top: number, unit: string = "px") {

@@ -1,5 +1,6 @@
-import { CanvasNodeElt } from "../canvas";
+import { Canvas } from "../canvas";
 import { CSS } from "../CSS";
+import { UpdateConnectorsEvent } from "../events";
 import { AutoLayout } from "./AutoLayout";
 
 export interface SingleRowAutoLayoutConfig {
@@ -13,7 +14,9 @@ export class SingleRowAutoLayout implements AutoLayout {
         hSpacing: 10
     }) {}
 
-    autoLayout(nodes: CanvasNodeElt[],) {
+    autoLayout(canvas: Canvas) {
+
+        const nodes = canvas.getNodes();
 
         if(!nodes.length) {
             return;
@@ -32,5 +35,8 @@ export class SingleRowAutoLayout implements AutoLayout {
                 prevElt.offsetTop,
             );
         }
+
+        const provider = UpdateConnectorsEvent.forCanvas(canvas);
+        provider.onUpdateConnectors();
     }
 }
