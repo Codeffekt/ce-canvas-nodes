@@ -18,7 +18,7 @@ export class CreateConnectorAction {
     private selectionEnterRef: any;
     private selectionLeaveRef: any;
     private connectorIsOnBlock = false;
-    private newConnector: Connector|null = null;
+    private newConnector: Connector | null = null;
 
     constructor(
         private block: CanvasBlockElt,
@@ -34,7 +34,7 @@ export class CreateConnectorAction {
             anchor.addEventListener("mousedown", (event: MouseEvent) => {
                 this.onDragMouseDown(event);
             });
-        }        
+        }
     }
 
     onDragMouseDown(event: MouseEvent) {
@@ -53,11 +53,11 @@ export class CreateConnectorAction {
         document.onmousemove = (event) => this.connectorMoved(event);
         this.selectionEnterRef = (evt: CustomEvent<CustomSelectionEvent>) => {
             const target = evt.detail.elt;
-            if(target.node() !== this.block.node()) {
+            if (target.node() !== this.block.node()) {
                 this.connectorOnBlock(target);
             }
         };
-        document.addEventListener(CE_CANVAS_SELECTION_ENTER, this.selectionEnterRef); 
+        document.addEventListener(CE_CANVAS_SELECTION_ENTER, this.selectionEnterRef);
         this.selectionLeaveRef = () => {
             this.newConnector = null;
         };
@@ -66,6 +66,7 @@ export class CreateConnectorAction {
     }
 
     private closeCreateEvent() {
+        this.newConnector?.getSrc().updateLink(this.newConnector.getDst().createBlockId());
         this.evtProvider.onCreateConnectorEnd(this.newConnector);
         document.removeEventListener(CE_CANVAS_SELECTION_ENTER, this.selectionEnterRef);
         document.removeEventListener(CE_CANVAS_SELECTION_LEAVE, this.selectionLeaveRef);
@@ -76,7 +77,7 @@ export class CreateConnectorAction {
     }
 
     private connectorMoved(event: MouseEvent) {
-        if(this.newConnector) {
+        if (this.newConnector) {
             return false;
         }
 
@@ -86,7 +87,7 @@ export class CreateConnectorAction {
         this.connectorPoints.b = CoordsUtils.getPointPositionInCanvasCoords(this.canvas, { x, y });
         this.evtProvider.onCreateConnectorMoved();
         this.updateConnectorDraft();
-    }    
+    }
 
     private createConnectorDraft() {
 

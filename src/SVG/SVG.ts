@@ -21,7 +21,7 @@ export class SVG {
 
     static createContainer(style: Style) {
         const svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        style.applyRootStyle(svgElement);
+        style.applySVGRootStyle(svgElement);
         return svgElement;
     }
 

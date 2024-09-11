@@ -6,6 +6,8 @@ import { BlockId } from "./BlockId";
 
 export class Connector {    
 
+    static ATTRIBUTE_NAME = "link";
+
     constructor(private src: CanvasBlockElt, private dst: CanvasBlockElt) {        
     }
 

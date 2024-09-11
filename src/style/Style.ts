@@ -36,6 +36,14 @@ export class Style {
         root.style.zIndex = "inherit";
     }
 
+    applySVGRootStyle(root: SVGSVGElement) {
+        root.style.overflow = "visible";
+        root.style.left = "0px";
+        root.style.top = "0px";
+        root.style.position = "absolute";
+        root.style.pointerEvents = "none";
+    }
+
     createMarkerElements(): SVGMarkerElement[] {
         const markerElementStyles: MarkerElementStyle[] = [
             { id: CanvasIds.forArrowType('arrow'), fill: this.colors['black'], class: this.classes['connector'] },

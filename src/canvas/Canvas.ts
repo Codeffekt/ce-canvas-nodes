@@ -1,7 +1,8 @@
 import { TranslateAction } from "../actions";
 import { ScaleAction } from "../actions/ScaleAction";
 import { AutoLayout } from "../auto-layout";
-import { CE_CANVAS_CREATE_CONNECTOR_END, CE_CANVAS_DRAGGED, CE_CANVAS_UPDATE_CONNECTORS, CustomCreateConnectorEvent, CustomUpdateConnectorsEvent } from "../events";
+import { DisposeInterface } from "../core";
+import { CE_CANVAS_DRAGGED, CE_CANVAS_UPDATE_CONNECTORS, CustomUpdateConnectorsEvent } from "../events";
 import { CE_CANVAS_TRANSFORMED, CustomTransformEvent, TransformEvent } from "../events/TransformEvent";
 import { Style } from "../style";
 import { PathBuilder } from "../SVG";
@@ -14,7 +15,7 @@ import { CanvasNodeElt } from "./CanvasNodeElt";
 import { CanvasTransform } from "./CanvasTransform";
 import { Connector } from "./Connector";
 
-export class Canvas {
+export class Canvas implements DisposeInterface {
 
     private nodesContainer: HTMLElement;
     private svgContainer: SVGElement;
@@ -33,14 +34,25 @@ export class Canvas {
     constructor(private canvasContainer: HTMLElement) {
         this.initCanvasNodesContainer();
         this.initCanvasNodes();
+        this.initConnectors();
+        this.buildSVGConnectors();
         this.initEventListeners();
         this.createActions();
+    }
+
+    dispose() {
+        this.clearSVGConnectors();
+        for(const node of this.nodes) {
+            node.dispose();
+        }
+        this.nodes = [];
+        this.connectors = [];        
     }
 
     addNodeFromElement(elt: HTMLElement) {
         const node = new CanvasNodeElt(this, elt);
         this.nodes.push(node);
-        this.updateConnectors(this.connectors);
+        this.updateConnectors();
         return node;
     }
 
@@ -52,29 +64,51 @@ export class Canvas {
         return this.nodes.find(node => node.id() === id);
     }
 
-    removeNode(node: CanvasNodeElt) {        
+    removeNode(node: CanvasNodeElt) {
         this.nodes = this.nodes.filter(elt => elt !== node);
         this.connectors = this.connectors.filter(
             connector => connector.getSrc().node() !== node && connector.getDst().node() !== node);
-        this.updateConnectors(this.connectors);
+        node.dispose();
+        this.updateConnectors();
     }
 
     removeNodeFromElement(elt: HTMLElement) {
         const node = this.nodes.find(node => node.getElement() === elt);
-        if(node) {
+        if (node) {
             this.removeNode(node);
         }
     }
 
-    updateConnectors(connectors: Connector[]) {        
-        this.clearSVGConnectors();
-        this.connectors = connectors;
+    updateConnectors() {
+        this.initConnectors();
+        this;this.redrawConnectors();
+    }
+
+    redrawConnectors() {
+        this.clearSVGConnectors();        
         this.buildSVGConnectors();
     }
 
     getBlockFromId(blockId: BlockId): CanvasBlockElt {
         const node = this.nodes.find(elt => elt.id() === blockId.nodeId);
         return node.getBlockFromId(blockId.blockId);
+    }
+
+    removeBlockFromId(blockId: BlockId): CanvasBlockElt | undefined {        
+        const node = this.nodes.find(elt => elt.id() === blockId.nodeId);
+        if (!node) {
+            return undefined;
+        }
+        const block = node.removeBlockFromId(blockId.blockId);
+
+        if (block) {
+            this.connectors = this.connectors.filter(
+                connector => connector.getSrcId() !== blockId.blockId && connector.getDstId() !== blockId.blockId
+            );
+            this.updateConnectors();
+        }
+
+        return block;
     }
 
     getContainer() {
@@ -94,7 +128,7 @@ export class Canvas {
     }
 
     applyAutoLayout(autoLayout: AutoLayout) {
-        autoLayout.autoLayout(this);        
+        autoLayout.autoLayout(this);
     }
 
     private retrieveNodesContainer() {
@@ -156,30 +190,39 @@ export class Canvas {
 
     private initEventListeners() {
         document.addEventListener(CE_CANVAS_DRAGGED, () => {
-            this.updateConnectors(this.connectors);
+            this.redrawConnectors();
         });
         document.addEventListener(CE_CANVAS_TRANSFORMED,
-            (evt: CustomEvent<CustomTransformEvent>) => {                
+            (evt: CustomEvent<CustomTransformEvent>) => {
                 this.transform = evt.detail.transform;
-                this.updateConnectors(this.connectors);
-            });
-        document.addEventListener(CE_CANVAS_CREATE_CONNECTOR_END,
-            (evt: CustomEvent<CustomCreateConnectorEvent>) => {
-                if (evt.detail.connector) {
-                    this.connectors.push(evt.detail.connector);
-                    this.updateConnectors(this.connectors);
-                }
+                this.redrawConnectors();
             });
         document.addEventListener(CE_CANVAS_UPDATE_CONNECTORS,
             (evt: CustomEvent<CustomUpdateConnectorsEvent>) => {
-                this.updateConnectors(this.connectors);
-            });        
+                this.updateConnectors();
+            });
     }
 
     private initCanvasNodes() {
         for (let child of Array.from(this.nodesContainer.getElementsByClassName(CanvasIds.getCanvasNodeClassName()))) {
             if (child instanceof HTMLElement) {
                 this.nodes.push(new CanvasNodeElt(this, child));
+            }
+        }
+    }
+
+    private initConnectors() {
+        this.connectors = [];
+        for(const node of this.nodes) {
+            const blocks = node.getBlocks();
+            for(const block of blocks) {
+                if(block.getLink()) {
+                    this.connectors.push(Connector.fromElementsId(
+                        this,
+                        block.createBlockId(),
+                        block.getLink()
+                    ));
+                }
             }
         }
     }

@@ -1,16 +1,30 @@
 import { DragAction } from "../actions/DragAction";
+import { DisposeInterface } from "../core";
 import { DragEvent } from "../events/DragEvent";
 import { Canvas } from "./Canvas";
 import { CanvasBlockElt } from "./CanvasBlockElt";
 import { CanvasIds } from "./CanvasIds";
 
-export class CanvasNodeElt {
+export class CanvasNodeElt implements DisposeInterface {
 
     private blocks: CanvasBlockElt[] = [];
+    private observer: MutationObserver;
+    private actions: DisposeInterface[] = [];
 
     constructor(private canvas: Canvas, private src: HTMLElement) {
         this.retrieveBlocks();
+        this.createObserver();
         this.createActions();
+    }
+
+    dispose() {
+        this.observer.disconnect();
+        for(const block of this.blocks) {
+            block.dispose();
+        }
+        for(const action of this.actions) {
+            action.dispose();
+        }
     }
 
     id() {
@@ -21,12 +35,27 @@ export class CanvasNodeElt {
         return this.canvas;
     }
 
+    getBlocks() {
+        return this.blocks;
+    }
+
     getBlockFromId(id: string) {
         return this.blocks.find(elt => elt.id() === id);
     }
 
+    getBlockFromNode(node: Node) {
+        return this.blocks.find(elt => elt.nativeElement() === node);
+    }
+
     getElement() {
         return this.src;
+    }
+
+    removeBlockFromId(id: string): CanvasBlockElt | undefined {
+        const block = this.getBlockFromId(id);
+        this.blocks = this.blocks.filter(block => block.id() !== id);
+        block.dispose();
+        return block;
     }
 
     private retrieveBlocks() {
@@ -38,6 +67,40 @@ export class CanvasNodeElt {
     }
 
     private createActions() {
-        new DragAction(this.canvas, this.src, DragEvent.forCanvasNodeElt(this));
+        this.actions.push(new DragAction(this.canvas, this.src, DragEvent.forCanvasNodeElt(this)));
+    }
+
+    private observeNodeChanges(mutationList: MutationRecord[], observer) {
+        for (const mutation of mutationList) {
+            if (mutation.type === "childList") {
+                this.removeBlocksFromChanges(mutation.removedNodes);
+                this.addBlocksFromChanges(mutation.addedNodes);
+            }
+        }
+    }
+
+    private removeBlocksFromChanges(nodeList: NodeList) {
+        const blocksToBeRemoved = Array.from(nodeList)
+            .map(node => this.getBlockFromNode(node))
+            .filter(block => block !== undefined);
+        for(const block of blocksToBeRemoved) {
+            this.canvas.removeBlockFromId(block.createBlockId());
+        }
+    }
+
+    private addBlocksFromChanges(nodeList: NodeList) {  
+        const blocksToBeAdded = Array.from(nodeList)
+            .filter(node => !this.getBlockFromNode(node))
+            .filter(node => node instanceof HTMLElement && node.classList.contains(CanvasIds.getCanvasBlockClassName()))
+            .map(node => new CanvasBlockElt(node as HTMLElement, this));
+        for(const block of blocksToBeAdded) {
+            this.blocks.push(block);
+        }
+        this.canvas.updateConnectors();
+    }
+
+    private createObserver() {
+        this.observer = new MutationObserver((mutationList, observer) => this.observeNodeChanges(mutationList, observer));
+        this.observer.observe(this.src, { attributes: true, childList: true, subtree: true });
     }
 }

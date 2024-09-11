@@ -2,8 +2,9 @@ import { Canvas } from "../canvas";
 import { DragEventProvider } from "../events/DragEvent";
 import { CoordsUtils } from "../utils/CoordsUtils";
 import { CSS } from "../CSS";
+import { DisposeInterface } from "../core";
 
-export class DragAction {
+export class DragAction implements DisposeInterface {
 
     private pos = {
         x: 0,
@@ -16,6 +17,9 @@ export class DragAction {
         private evtProvider: DragEventProvider
     ) {
         this.createEventListeners();
+    }
+    
+    dispose() {        
     }
 
     private createEventListeners() {

@@ -1,6 +1,6 @@
 {
   "name": "@codeffekt/ce-canvas-nodes",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Base library to create ui for forms relations",
   "type": "module",
   "main": "dist/ce-canvas-nodes.esm.js",
