@@ -1,5 +1,13 @@
 import { BlockIdUtils, Canvas, Connector, SingleRowAutoLayout, ZoomToFit } from '../dist/ce-canvas-nodes.esm.js';
 
+function domify (str) {
+    const el = document.createElement('div');
+    el.innerHTML = str;
+  
+    const frag = document.createDocumentFragment();
+    return frag.appendChild(el.removeChild(el.firstChild));
+  }
+
 function applyAutoLayout(canvas) {
     canvas.applyAutoLayout(new SingleRowAutoLayout());
 }
@@ -26,6 +34,22 @@ function removeBlock(canvas, blockId) {
     }
 }
 
+function removeNode(canvas, nodeId) {
+    const node = canvas.getNodeFromElementId(nodeId);
+    if(node) {
+        node.getElement().remove();
+    }
+}
+
+function addNode(canvas) {
+    const container = canvas.getNodesContainer();
+    const element = domify(`<div id="elt4" class="canvas-node-elt"><div id="header" class="canvas-block-elt">
+    <div class="canvas-anchor" id="left-anchor"></div>
+    <div class="canvas-anchor" id="right-anchor"></div>
+    </div></div>`);    
+    container.appendChild(element);
+}
+
 function bootstrap() {
 
     const root = document.getElementById("canvas");
@@ -47,6 +71,8 @@ function bootstrap() {
         { nodeId: "elt1", blockId: "header"},
         { nodeId: "elt3", blockId: "header" })
     );
+    document.querySelector('#removeNode').addEventListener('click', () => removeNode(canvas, "elt1"));
+    document.querySelector('#addNode').addEventListener('click', () => addNode(canvas));
 }
 
 bootstrap();

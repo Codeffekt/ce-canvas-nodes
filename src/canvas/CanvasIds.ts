@@ -7,15 +7,7 @@ const arrow_ids = {
     "arrow_selected": "tds_arrow_selected"
 };
 
-export class CanvasIds {
-
-    static getLeftAnchorId() {
-        return "left-anchor";
-    }
-
-    static getRightAnchorId() {
-        return "right-anchor";
-    }
+export class CanvasIds {    
 
     static getAnchorClassName() {
         return "canvas-anchor";

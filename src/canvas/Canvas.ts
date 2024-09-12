@@ -22,6 +22,7 @@ export class Canvas implements DisposeInterface {
     private connectorsContainer: SVGElement;
     private connectors: Connector[] = [];
     private nodes: CanvasNodeElt[] = [];
+    private observer: MutationObserver;
     private style = new Style();
     private transform: CanvasTransform = {
         translation: {
@@ -37,10 +38,12 @@ export class Canvas implements DisposeInterface {
         this.initConnectors();
         this.buildSVGConnectors();
         this.initEventListeners();
+        this.createObserver();
         this.createActions();
     }
 
     dispose() {
+        this.observer.disconnect();
         this.clearSVGConnectors();
         for(const node of this.nodes) {
             node.dispose();
@@ -49,7 +52,7 @@ export class Canvas implements DisposeInterface {
         this.connectors = [];        
     }
 
-    addNodeFromElement(elt: HTMLElement) {
+    addNodeFromElement(elt: HTMLElement) {        
         const node = new CanvasNodeElt(this, elt);
         this.nodes.push(node);
         this.updateConnectors();
@@ -62,6 +65,10 @@ export class Canvas implements DisposeInterface {
 
     getNodeFromElementId(id: string) {
         return this.nodes.find(node => node.id() === id);
+    }
+
+    getNodeFromElement(node: Node) {
+        return this.nodes.find(elt => elt.getElement() === node);
     }
 
     removeNode(node: CanvasNodeElt) {
@@ -227,8 +234,40 @@ export class Canvas implements DisposeInterface {
         }
     }
 
+    private observeNodeChanges(mutationList: MutationRecord[], observer) {
+        for (const mutation of mutationList) {
+            if (mutation.type === "childList") {
+                this.removeNodesFromChanges(mutation.removedNodes);
+                this.addNodesFromChanges(mutation.addedNodes);
+            }
+        }
+    }
+
+    private removeNodesFromChanges(nodeList: NodeList) {
+        const nodesToBeRemoved = Array.from(nodeList)            
+            .filter(node => node instanceof HTMLElement);
+        for(const node of nodesToBeRemoved) {
+            this.removeNodeFromElement(node);
+        }
+    }
+
+    private addNodesFromChanges(nodeList: NodeList) {        
+        const nodesToBeAdded = Array.from(nodeList)
+            .filter(node => node instanceof HTMLElement)
+            .filter(node => node.classList.contains(CanvasIds.getCanvasNodeClassName()))                    
+            .filter(node => !this.getNodeFromElement(node));        
+        for(const node of nodesToBeAdded) {
+            this.addNodeFromElement(node);
+        }
+    }
+
     private createActions() {
         new TranslateAction(this, TransformEvent.forCanvas(this));
         new ScaleAction(this, TransformEvent.forCanvas(this));
+    }
+
+    private createObserver() {
+        this.observer = new MutationObserver((mutationList, observer) => this.observeNodeChanges(mutationList, observer));
+        this.observer.observe(this.nodesContainer, { attributes: false, childList: true, subtree: false });
     }
 }
