@@ -2,7 +2,7 @@ import { Canvas } from "../canvas";
 import { DragEventProvider } from "../events/DragEvent";
 import { CoordsUtils } from "../utils/CoordsUtils";
 import { CSS } from "../CSS";
-import { DisposeInterface } from "../core";
+import { DisposeInterface, Vector2 } from "../core";
 
 export class DragAction implements DisposeInterface {
 
@@ -18,8 +18,8 @@ export class DragAction implements DisposeInterface {
     ) {
         this.createEventListeners();
     }
-    
-    dispose() {        
+
+    dispose() {
     }
 
     private createEventListeners() {
@@ -30,7 +30,7 @@ export class DragAction implements DisposeInterface {
 
     }
 
-    private onDragMouseDown(event: MouseEvent) {        
+    private onDragMouseDown(event: MouseEvent) {
         this.evtProvider.onElementStartDragging();
         event.preventDefault();
         this.pos.x = event.clientX;
@@ -47,15 +47,18 @@ export class DragAction implements DisposeInterface {
 
     private elementDrag(event: MouseEvent) {
         event.preventDefault();
-        const deltaX = CoordsUtils.applyScale(this.canvas, this.pos.x - event.clientX);
-        const deltaY = CoordsUtils.applyScale(this.canvas, this.pos.y - event.clientY);
+        const delta: Vector2 = CoordsUtils.applyScale(this.canvas,
+            {
+                x: this.pos.x - event.clientX,
+                y: this.pos.y - event.clientY
+            });        
         this.pos.x = event.clientX;
         this.pos.y = event.clientY;
         CSS.setEltUpperLeftPos(
-            this.elt,  
-            (this.elt.offsetLeft - deltaX), 
-            (this.elt.offsetTop - deltaY)
-        );        
+            this.elt,
+            (this.elt.offsetLeft - delta.x),
+            (this.elt.offsetTop - delta.y)
+        );
         this.evtProvider.onElementDragged();
     }
 }

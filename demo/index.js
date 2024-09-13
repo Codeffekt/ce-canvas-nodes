@@ -1,4 +1,4 @@
-import { BlockIdUtils, Canvas, Connector, SingleRowAutoLayout, ZoomToFit } from '../dist/ce-canvas-nodes.esm.js';
+import { BlockIdUtils, Canvas, CenterElts, Connector, SingleRowAutoLayout, ZoomToFit } from '../dist/ce-canvas-nodes.esm.js';
 
 function domify (str) {
     const el = document.createElement('div');
@@ -14,6 +14,10 @@ function applyAutoLayout(canvas) {
 
 function zoomToFit(canvas) {
     canvas.applyAutoLayout(new ZoomToFit());
+}
+
+function centerElts(canvas) {
+    canvas.applyAutoLayout(new CenterElts());
 }
 
 function addLink(canvas, src, dst) {
@@ -62,6 +66,7 @@ function bootstrap() {
     
     document.querySelector('#autoLayout').addEventListener('click', () => applyAutoLayout(canvas));
     document.querySelector('#zoomToFit').addEventListener('click', () => zoomToFit(canvas));
+    document.querySelector('#centerElts').addEventListener('click', () => centerElts(canvas));
     document.querySelector('#removeBlock').addEventListener('click', () => removeBlock(canvas, { nodeId: "elt2", blockId: "block2" }));
     document.querySelector('#addLink').addEventListener('click', () => addLink(canvas, 
         { nodeId: "elt1", blockId: "block2" },

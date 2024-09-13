@@ -1,13 +1,13 @@
 import { Canvas } from "../canvas";
-import { SVGPoint } from "../SVG";
+import { Vector2 } from "../core";
 
 export class CoordsUtils {
 
-    static getElementCenterPositionInCanvasCoords(canvas: Canvas, elt: HTMLElement): SVGPoint {
+    static getElementCenterPositionInCanvasCoords(canvas: Canvas, elt: HTMLElement): Vector2 {
         const canvasEltRect = canvas.getNodesContainer().getBoundingClientRect();
         const eltRect = elt.getBoundingClientRect();
     
-        const scale = canvasEltRect.width / canvas.getNodesContainer().clientWidth;
+        const scale = canvas.getScale();
     
         const left = (eltRect.left - canvasEltRect.left) / scale;
         const top = (eltRect.top - canvasEltRect.top) / scale;
@@ -17,10 +17,10 @@ export class CoordsUtils {
         return { x , y }; 
     }
 
-    static getPointPositionInCanvasCoords(canvas: Canvas, point: SVGPoint): SVGPoint {
+    static getPointPositionInCanvasCoords(canvas: Canvas, point: Vector2): Vector2 {
         const canvasEltRect = canvas.getNodesContainer().getBoundingClientRect();        
-    
-        const scale = canvasEltRect.width / canvas.getNodesContainer().clientWidth;
+            
+        const scale = canvas.getScale();
 
         const x = (point.x - canvasEltRect.left) / scale;
         const y = (point.y - canvasEltRect.top) / scale;        
@@ -28,8 +28,17 @@ export class CoordsUtils {
         return { x , y }; 
     }
 
-    static applyScale(canvas: Canvas, value: number) {
-        const scale = canvas.getNodesContainer().getBoundingClientRect().width / canvas.getNodesContainer().clientWidth;
-        return value / scale;
+    static applyScale(canvas: Canvas, value: Vector2): Vector2 {        
+        const scale = canvas.getScale();
+        return { x: value.x / scale, y: value.y / scale };
+    }
+
+    static getElementCoordsInCanvasCoordsNorm(canvas: Canvas, elt: HTMLElement): Vector2 {
+        const scale =   canvas.getScale();
+        const canvasEltRect = canvas.getNodesContainer().getBoundingClientRect();
+        return {
+            x: (elt.offsetLeft * scale) / canvasEltRect.width,
+            y: (elt.offsetTop * scale) / canvasEltRect.height
+        }; 
     }
 }

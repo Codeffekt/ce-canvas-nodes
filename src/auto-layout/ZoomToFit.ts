@@ -13,9 +13,9 @@ export class ZoomToFit implements AutoLayout {
 
     constructor(private config: ZoomToFitConfig = { wantedRatio: 0.8 }) {}
 
-    autoLayout(canvas: Canvas) {        
-        this.zoomElts(canvas);
-        canvas.applyAutoLayout(new CenterElts());
+    autoLayout(canvas: Canvas) { 
+        canvas.applyAutoLayout(new CenterElts());       
+        this.zoomElts(canvas);        
     }
 
     private zoomElts(canvas: Canvas) {

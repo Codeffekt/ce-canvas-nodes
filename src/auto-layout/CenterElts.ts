@@ -1,6 +1,8 @@
 import { Canvas, CanvasTransform } from "../canvas";
+import { Vector2 } from "../core";
 import { CSS } from "../CSS";
 import { TransformEvent } from "../events";
+import { CoordsUtils } from "../utils";
 import { AutoLayout } from "./AutoLayout";
 import { AutoLayoutUtils } from "./utils";
 
@@ -17,28 +19,40 @@ export class CenterElts implements AutoLayout {
 
         if(!nodes.length) {
             return;
-        }
+        }        
 
         const bbox = AutoLayoutUtils.computeNodesBBox(nodes);       
 
         const transform = this.retrieveCurrentTransform(canvas);
 
-        const bboxCenter = {
+        const bboxCenter: Vector2 = {
             x: (bbox.left + bbox.right) / 2,
             y: (bbox.top + bbox.bottom) / 2
         };
 
+        console.log(bboxCenter);
+
         const containerBox = canvas.getContainer().getBoundingClientRect();
 
-        const containerCenter = {
+        const containerCenter: Vector2 = {
             x: (containerBox.left + containerBox.right) / 2,
             y: (containerBox.top + containerBox.bottom) / 2
         };        
 
-        transform.translation.tx = transform.translation.tx + containerCenter.x - bboxCenter.x; 
-        transform.translation.ty = transform.translation.ty + containerCenter.y - bboxCenter.y;        
+        const delta: Vector2 = CoordsUtils.applyScale(canvas, {
+            x: containerCenter.x - bboxCenter.x + transform.translation.tx,
+            y: containerCenter.y - bboxCenter.y + transform.translation.ty,
+        });        
 
-        this.applyTransform(canvas, transform);
+        transform.translation.tx = 0; 
+        transform.translation.ty = 0;        
+
+        this.applyTransform(canvas.getNodesContainer(), transform);
+        CSS.setEltUpperLeftPos(canvas.getNodesContainer(), 0, 0);
+
+        for(const node of nodes) {
+            node.translate(delta)
+        }
 
         const provider = TransformEvent.forCanvas(canvas);
         provider.onElementTransform(transform);
@@ -48,8 +62,8 @@ export class CenterElts implements AutoLayout {
         return CSS.updateTransform(canvas.getNodesContainer());        
     }
 
-    private applyTransform(canvas: Canvas, transform: CanvasTransform) {
-        CSS.applyTransformOnStyle(canvas.getNodesContainer(), transform);        
+    private applyTransform(elt: HTMLElement, transform: CanvasTransform) {
+        CSS.applyTransformOnStyle(elt, transform);        
     }
     
 }

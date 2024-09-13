@@ -1,18 +1,26 @@
 import { DragAction } from "../actions/DragAction";
-import { DisposeInterface } from "../core";
+import { DisposeInterface, Vector2 } from "../core";
+import { CSS } from "../CSS";
 import { DragEvent } from "../events/DragEvent";
+import { CoordsUtils } from "../utils";
 import { Canvas } from "./Canvas";
 import { CanvasBlockElt } from "./CanvasBlockElt";
 import { CanvasIds } from "./CanvasIds";
 
 export class CanvasNodeElt implements DisposeInterface {
 
+    static ATTRIBUTE_X = "x";
+    static ATTRIBUTE_Y = "y";
+
     private blocks: CanvasBlockElt[] = [];
     private observer: MutationObserver;
     private actions: DisposeInterface[] = [];
+    // relative coords from [0;1] on the canvas container
+    private coords: Vector2 = { x: 0, y: 0 };
 
     constructor(private canvas: Canvas, private src: HTMLElement) {
         this.retrieveBlocks();
+        this.retrieveCoords();
         this.createObserver();
         this.createActions();
     }
@@ -39,6 +47,10 @@ export class CanvasNodeElt implements DisposeInterface {
         return this.blocks;
     }
 
+    getCoords() {
+        return this.coords;
+    }
+
     getBlockFromId(id: string) {
         return this.blocks.find(elt => elt.id() === id);
     }
@@ -58,12 +70,23 @@ export class CanvasNodeElt implements DisposeInterface {
         return block;
     }
 
+    translate(delta: Vector2) {
+        CSS.setEltUpperLeftPos(this.src,
+            this.src.offsetLeft + delta.x,
+            this.src.offsetTop + delta.y
+        );
+    }
+
     private retrieveBlocks() {
         for (let child of Array.from(this.src.getElementsByClassName(CanvasIds.getCanvasBlockClassName()))) {
             if (child instanceof HTMLElement) {
                 this.blocks.push(new CanvasBlockElt(child, this));
             }
         }
+    }
+
+    private retrieveCoords() {          
+        this.coords = CoordsUtils.getElementCoordsInCanvasCoordsNorm(this.canvas, this.src);
     }
 
     private createActions() {
@@ -75,6 +98,8 @@ export class CanvasNodeElt implements DisposeInterface {
             if (mutation.type === "childList") {
                 this.removeBlocksFromChanges(mutation.removedNodes);
                 this.addBlocksFromChanges(mutation.addedNodes);
+            } else {
+                this.retrieveCoords();
             }
         }
     }

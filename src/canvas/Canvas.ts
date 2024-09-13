@@ -134,6 +134,14 @@ export class Canvas implements DisposeInterface {
         return this.style;
     }
 
+    getTransform() {
+        return this.transform;
+    }
+
+    getScale() {
+        return this.transform.scale;
+    }
+
     applyAutoLayout(autoLayout: AutoLayout) {
         autoLayout.autoLayout(this);
     }
