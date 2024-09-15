@@ -33,12 +33,21 @@ export class CoordsUtils {
         return { x: value.x / scale, y: value.y / scale };
     }
 
-    static getElementCoordsInCanvasCoordsNorm(canvas: Canvas, elt: HTMLElement): Vector2 {
+    static offsetToCanvasCoordsNorm(canvas: Canvas, elt: HTMLElement): Vector2 {
         const scale =   canvas.getScale();
         const canvasEltRect = canvas.getNodesContainer().getBoundingClientRect();
         return {
             x: (elt.offsetLeft * scale) / canvasEltRect.width,
             y: (elt.offsetTop * scale) / canvasEltRect.height
         }; 
+    }
+
+    static canvasCoordsNormToOffset(canvas: Canvas, coords: Vector2): Vector2 {
+        const scale = canvas.getScale();
+        const canvasEltRect = canvas.getNodesContainer().getBoundingClientRect();
+        return {
+            x: (coords.x * canvasEltRect.width) / scale,
+            y: (coords.y * canvasEltRect.height) / scale,
+        };
     }
 }

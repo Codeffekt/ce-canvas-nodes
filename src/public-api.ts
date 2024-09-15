@@ -8,4 +8,5 @@ export * from './CSS';
 export * from './utils';
 export * from './auto-layout';
 export * from './core';
+export * from './format';
 

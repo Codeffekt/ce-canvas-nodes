@@ -14,13 +14,10 @@ export class CanvasNodeElt implements DisposeInterface {
 
     private blocks: CanvasBlockElt[] = [];
     private observer: MutationObserver;
-    private actions: DisposeInterface[] = [];
-    // relative coords from [0;1] on the canvas container
-    private coords: Vector2 = { x: 0, y: 0 };
+    private actions: DisposeInterface[] = [];    
 
     constructor(private canvas: Canvas, private src: HTMLElement) {
-        this.retrieveBlocks();
-        this.retrieveCoords();
+        this.retrieveBlocks();        
         this.createObserver();
         this.createActions();
     }
@@ -45,11 +42,7 @@ export class CanvasNodeElt implements DisposeInterface {
 
     getBlocks() {
         return this.blocks;
-    }
-
-    getCoords() {
-        return this.coords;
-    }
+    }    
 
     getBlockFromId(id: string) {
         return this.blocks.find(elt => elt.id() === id);
@@ -83,11 +76,7 @@ export class CanvasNodeElt implements DisposeInterface {
                 this.blocks.push(new CanvasBlockElt(child, this));
             }
         }
-    }
-
-    private retrieveCoords() {          
-        this.coords = CoordsUtils.getElementCoordsInCanvasCoordsNorm(this.canvas, this.src);
-    }
+    }    
 
     private createActions() {
         this.actions.push(new DragAction(this.canvas, this.src, DragEvent.forCanvasNodeElt(this)));
@@ -98,8 +87,6 @@ export class CanvasNodeElt implements DisposeInterface {
             if (mutation.type === "childList") {
                 this.removeBlocksFromChanges(mutation.removedNodes);
                 this.addBlocksFromChanges(mutation.addedNodes);
-            } else {
-                this.retrieveCoords();
             }
         }
     }
@@ -126,6 +113,6 @@ export class CanvasNodeElt implements DisposeInterface {
 
     private createObserver() {
         this.observer = new MutationObserver((mutationList, observer) => this.observeNodeChanges(mutationList, observer));
-        this.observer.observe(this.src, { attributes: true, childList: true, subtree: true });
+        this.observer.observe(this.src, { attributes: false, childList: true, subtree: true });
     }
 }

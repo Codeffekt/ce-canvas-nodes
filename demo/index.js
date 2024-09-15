@@ -45,6 +45,10 @@ function removeNode(canvas, nodeId) {
     }
 }
 
+function importLayout(canvas) {
+    
+}
+
 function addNode(canvas) {
     const container = canvas.getNodesContainer();
     const element = domify(`<div id="elt4" class="canvas-node-elt"><div id="header" class="canvas-block-elt">
@@ -78,6 +82,7 @@ function bootstrap() {
     );
     document.querySelector('#removeNode').addEventListener('click', () => removeNode(canvas, "elt1"));
     document.querySelector('#addNode').addEventListener('click', () => addNode(canvas));
+    document.querySelector('#importLayout').addEventListener('click', () => importLayout(canvas));
 }
 
 bootstrap();
