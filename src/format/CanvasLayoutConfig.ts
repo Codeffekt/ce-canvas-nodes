@@ -1,4 +1,3 @@
-import { CanvasTransform } from "../canvas";
 import { Vector2 } from "../core";
 
 export interface CanvasNodeLayoutConfig {
@@ -6,7 +5,6 @@ export interface CanvasNodeLayoutConfig {
     coords: Vector2;
 }
 
-export interface CanvasLayoutConfig {
-    transform: CanvasTransform;
+export interface CanvasLayoutConfig {    
     nodes: CanvasNodeLayoutConfig[];
 }
