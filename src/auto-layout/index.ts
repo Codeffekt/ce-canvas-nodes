@@ -3,4 +3,5 @@ export * from './SingleRowAutoLayout';
 export * from './ZoomToFit';
 export * from './CenterElts';
 export * from './ImportLayout';
+export * from './ExportLayout';
 export * from './utils';
