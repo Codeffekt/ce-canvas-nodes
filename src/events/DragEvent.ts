@@ -6,7 +6,7 @@ export const CE_CANVAS_END_DRAGGING = "ce-canvas-end-dragging";
 
 export interface CustomDragEvent {
     type: "canvas-node-elt",
-    elt: CanvasNodeElt
+    elts: CanvasNodeElt[]
 }
 
 export interface DragEventProvider {
@@ -19,13 +19,13 @@ export interface DragEventProvider {
 
 export class DragEvent {
 
-    static forCanvasNodeElt(elt: CanvasNodeElt): DragEventProvider {
+    static forCanvasNodeElts(elts: CanvasNodeElt[]): DragEventProvider {
         return {
             onElementStartDragging: () => {
                 const evt = new CustomEvent<CustomDragEvent>(CE_CANVAS_START_DRAGGING, {
                     detail: {
                         type: "canvas-node-elt",
-                        elt
+                        elts
                     }
                 });
                 document.dispatchEvent(evt);
@@ -34,7 +34,7 @@ export class DragEvent {
                 const evt = new CustomEvent<CustomDragEvent>(CE_CANVAS_DRAGGED, {
                     detail: {
                         type: "canvas-node-elt",
-                        elt
+                        elts
                     }
                 });
                 document.dispatchEvent(evt);
@@ -43,7 +43,7 @@ export class DragEvent {
                 const evt = new CustomEvent<CustomDragEvent>(CE_CANVAS_END_DRAGGING, {
                     detail: {
                         type: "canvas-node-elt",
-                        elt
+                        elts
                     }
                 });
                 document.dispatchEvent(evt);
