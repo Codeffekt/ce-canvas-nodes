@@ -1,6 +1,6 @@
 import { TranslateAction } from "../actions";
 import { ScaleAction } from "../actions/ScaleAction";
-import { AutoLayout } from "../auto-layout";
+import { AutoLayout, AutoLayoutConfig } from "../auto-layout";
 import { DisposeInterface } from "../core";
 import { CE_CANVAS_DRAGGED, CE_CANVAS_UPDATE_CONNECTORS, CustomUpdateConnectorsEvent } from "../events";
 import { CE_CANVAS_TRANSFORMED, CustomTransformEvent, TransformEvent } from "../events/TransformEvent";
@@ -142,8 +142,8 @@ export class Canvas implements DisposeInterface {
         return this.transform.scale;
     }
 
-    applyAutoLayout(autoLayout: AutoLayout) {
-        autoLayout.autoLayout(this);
+    applyAutoLayout(autoLayout: AutoLayout, config?: AutoLayoutConfig) {
+        autoLayout.autoLayout(this, config);
     }
 
     private retrieveNodesContainer() {
