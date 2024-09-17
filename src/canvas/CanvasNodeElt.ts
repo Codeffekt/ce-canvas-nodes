@@ -2,7 +2,7 @@ import { DragAction } from "../actions/DragAction";
 import { DisposeInterface, Vector2 } from "../core";
 import { CSS } from "../CSS";
 import { DragEvent } from "../events/DragEvent";
-import { CoordsUtils } from "../utils";
+import { CoordsUtils, HTMLUtils } from "../utils";
 import { Canvas } from "./Canvas";
 import { CanvasBlockElt } from "./CanvasBlockElt";
 import { CanvasIds } from "./CanvasIds";
@@ -14,20 +14,25 @@ export class CanvasNodeElt implements DisposeInterface {
 
     private blocks: CanvasBlockElt[] = [];
     private observer: MutationObserver;
-    private actions: DisposeInterface[] = [];    
+    private actions: DisposeInterface[] = [];
+    private coords: Vector2 = {
+        x: 0,
+        y: 0
+    };
 
     constructor(private canvas: Canvas, private src: HTMLElement) {
-        this.retrieveBlocks();        
+        this.retrieveBlocks();
+        this.retrieveCoords();
         this.createObserver();
         this.createActions();
     }
 
     dispose() {
         this.observer.disconnect();
-        for(const block of this.blocks) {
+        for (const block of this.blocks) {
             block.dispose();
         }
-        for(const action of this.actions) {
+        for (const action of this.actions) {
             action.dispose();
         }
     }
@@ -42,7 +47,7 @@ export class CanvasNodeElt implements DisposeInterface {
 
     getBlocks() {
         return this.blocks;
-    }    
+    }
 
     getBlockFromId(id: string) {
         return this.blocks.find(elt => elt.id() === id);
@@ -64,10 +69,20 @@ export class CanvasNodeElt implements DisposeInterface {
     }
 
     translate(delta: Vector2) {
-        CSS.setEltUpperLeftPos(this.src,
-            this.src.offsetLeft + delta.x,
-            this.src.offsetTop + delta.y
-        );
+        this.setCoords({
+            x: this.coords.x + delta.x,
+            y: this.coords.y + delta.y
+        });
+    }
+
+    setCoords(coords: Vector2) {        
+        this.coords = coords;
+        this.src.setAttribute(CanvasNodeElt.ATTRIBUTE_X, this.coords.x.toString());
+        this.src.setAttribute(CanvasNodeElt.ATTRIBUTE_Y, this.coords.y.toString());        
+    }
+
+    getCoords() {
+        return this.coords;
     }
 
     private retrieveBlocks() {
@@ -76,18 +91,61 @@ export class CanvasNodeElt implements DisposeInterface {
                 this.blocks.push(new CanvasBlockElt(child, this));
             }
         }
-    }    
+    }
+
+    private retrieveCoords() {
+        this.coords = {
+            x: HTMLUtils.getFloatAttribute(this.src, CanvasNodeElt.ATTRIBUTE_X) ?? 0,
+            y: HTMLUtils.getFloatAttribute(this.src, CanvasNodeElt.ATTRIBUTE_Y) ?? 0
+        };
+        this.applyCoords();
+    }
+
+    private applyCoords() {
+        const offset = CoordsUtils.canvasCoordsNormToOffset(
+            this.canvas,
+            this.coords
+        );
+        CSS.setEltUpperLeftPos(
+            this.src,
+            offset.x,
+            offset.y
+        );
+    }
+
+    private updateCoordX() {        
+        this.coords.x = HTMLUtils.getFloatAttribute(this.src, CanvasNodeElt.ATTRIBUTE_X) ?? 0;
+        this.applyCoords();
+    }
+
+    private updateCoordY() {        
+        this.coords.y = HTMLUtils.getFloatAttribute(this.src, CanvasNodeElt.ATTRIBUTE_Y) ?? 0;
+        this.applyCoords();
+    }
 
     private createActions() {
-        this.actions.push(new DragAction(this.canvas, this.src, DragEvent.forCanvasNodeElt(this)));
+        this.actions.push(new DragAction(this.canvas, this, DragEvent.forCanvasNodeElts([this])));
     }
 
     private observeNodeChanges(mutationList: MutationRecord[], observer) {
+        let nodeHasMoved = false;
         for (const mutation of mutationList) {
             if (mutation.type === "childList") {
                 this.removeBlocksFromChanges(mutation.removedNodes);
                 this.addBlocksFromChanges(mutation.addedNodes);
+            } else if (mutation.type === "attributes" &&
+                mutation.target === this.src) {
+                if (mutation.attributeName === CanvasNodeElt.ATTRIBUTE_X) {
+                    this.updateCoordX();
+                    nodeHasMoved = true;
+                } else if (mutation.attributeName === CanvasNodeElt.ATTRIBUTE_Y) {
+                    this.updateCoordY();
+                    nodeHasMoved = true;
+                }
             }
+        }
+        if(nodeHasMoved) {
+            this.canvas.updateConnectors();
         }
     }
 
@@ -95,17 +153,17 @@ export class CanvasNodeElt implements DisposeInterface {
         const blocksToBeRemoved = Array.from(nodeList)
             .map(node => this.getBlockFromNode(node))
             .filter(block => block !== undefined);
-        for(const block of blocksToBeRemoved) {
+        for (const block of blocksToBeRemoved) {
             this.canvas.removeBlockFromId(block.createBlockId());
         }
     }
 
-    private addBlocksFromChanges(nodeList: NodeList) {  
+    private addBlocksFromChanges(nodeList: NodeList) {
         const blocksToBeAdded = Array.from(nodeList)
             .filter(node => !this.getBlockFromNode(node))
             .filter(node => node instanceof HTMLElement && node.classList.contains(CanvasIds.getCanvasBlockClassName()))
             .map(node => new CanvasBlockElt(node as HTMLElement, this));
-        for(const block of blocksToBeAdded) {
+        for (const block of blocksToBeAdded) {
             this.blocks.push(block);
         }
         this.canvas.updateConnectors();
@@ -113,6 +171,6 @@ export class CanvasNodeElt implements DisposeInterface {
 
     private createObserver() {
         this.observer = new MutationObserver((mutationList, observer) => this.observeNodeChanges(mutationList, observer));
-        this.observer.observe(this.src, { attributes: false, childList: true, subtree: true });
+        this.observer.observe(this.src, { attributes: true, childList: true, subtree: true });
     }
 }

@@ -21,16 +21,14 @@ export class CenterElts implements AutoLayout {
             return;
         }        
 
-        const bbox = AutoLayoutUtils.computeNodesBBox(nodes);       
+        const bbox = AutoLayoutUtils.computeNodesBBox(nodes);               
 
         const transform = this.retrieveCurrentTransform(canvas);
 
         const bboxCenter: Vector2 = {
             x: (bbox.left + bbox.right) / 2,
             y: (bbox.top + bbox.bottom) / 2
-        };
-
-        console.log(bboxCenter);
+        };       
 
         const containerBox = canvas.getContainer().getBoundingClientRect();
 
@@ -50,8 +48,12 @@ export class CenterElts implements AutoLayout {
         this.applyTransform(canvas.getNodesContainer(), transform);
         CSS.setEltUpperLeftPos(canvas.getNodesContainer(), 0, 0);
 
+        const deltaNorm = CoordsUtils.coordsToCanvasCoordsNorm(
+            canvas, delta
+        );
+
         for(const node of nodes) {
-            node.translate(delta)
+            node.translate(deltaNorm)
         }
 
         const provider = TransformEvent.forCanvas(canvas);

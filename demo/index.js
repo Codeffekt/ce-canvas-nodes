@@ -1,4 +1,4 @@
-import { BlockIdUtils, Canvas, CenterElts, Connector, SingleRowAutoLayout, ZoomToFit } from '../dist/ce-canvas-nodes.esm.js';
+import { BlockIdUtils, Canvas, CenterElts, Connector, ExportLayout, ImportLayout, SingleRowAutoLayout, ZoomToFit } from '../dist/ce-canvas-nodes.esm.js';
 
 function domify (str) {
     const el = document.createElement('div');
@@ -45,8 +45,28 @@ function removeNode(canvas, nodeId) {
     }
 }
 
-function importLayout(canvas) {
-    
+function importLayout(canvas, storageKey) {
+    const layout = localStorage.getItem(storageKey) ? JSON.parse(localStorage.getItem(storageKey)) : {
+        transform: {
+            translation: {
+                tx: 0,
+                ty: 0
+            },
+            scale: 1.5
+        },
+        nodes: [{
+            id: "elt1",
+            coords: { x: 0.5, y: 0.5 }
+        }]
+    };
+    canvas.applyAutoLayout(new ImportLayout(layout));
+}
+
+function exportLayout(canvas, storageKey) {
+    const exportLayout = new ExportLayout();
+    canvas.applyAutoLayout(exportLayout);
+    const layout = exportLayout.getExportedLayout();
+    localStorage.setItem(storageKey, JSON.stringify(layout));
 }
 
 function addNode(canvas) {
@@ -68,6 +88,8 @@ function bootstrap() {
 
     const canvas = new Canvas(root);    
     
+    const LOCAL_STORAGE_KEY = "ce-canvas-nodes-demo";
+
     document.querySelector('#autoLayout').addEventListener('click', () => applyAutoLayout(canvas));
     document.querySelector('#zoomToFit').addEventListener('click', () => zoomToFit(canvas));
     document.querySelector('#centerElts').addEventListener('click', () => centerElts(canvas));
@@ -83,6 +105,7 @@ function bootstrap() {
     document.querySelector('#removeNode').addEventListener('click', () => removeNode(canvas, "elt1"));
     document.querySelector('#addNode').addEventListener('click', () => addNode(canvas));
     document.querySelector('#importLayout').addEventListener('click', () => importLayout(canvas));
+    document.querySelector('#exportLayout').addEventListener('click', () => exportLayout(canvas));
 }
 
 bootstrap();
