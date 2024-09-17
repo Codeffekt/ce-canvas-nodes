@@ -36,6 +36,7 @@ export class ScaleAction {
         this.applyTransform();
 
         this.evtProvider.onElementTransform(this.transform);
+        this.evtProvider.onElementEndTransform(this.transform);
     }
 
     private applyTransform() {
