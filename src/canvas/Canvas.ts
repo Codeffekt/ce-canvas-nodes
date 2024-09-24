@@ -45,14 +45,14 @@ export class Canvas implements DisposeInterface {
     dispose() {
         this.observer.disconnect();
         this.clearSVGConnectors();
-        for(const node of this.nodes) {
+        for (const node of this.nodes) {
             node.dispose();
         }
         this.nodes = [];
-        this.connectors = [];        
+        this.connectors = [];
     }
 
-    addNodeFromElement(elt: HTMLElement) {        
+    addNodeFromElement(elt: HTMLElement) {
         const node = new CanvasNodeElt(this, elt);
         this.nodes.push(node);
         this.updateConnectors();
@@ -88,20 +88,20 @@ export class Canvas implements DisposeInterface {
 
     updateConnectors() {
         this.initConnectors();
-        this;this.redrawConnectors();
+        this; this.redrawConnectors();
     }
 
     redrawConnectors() {
-        this.clearSVGConnectors();        
+        this.clearSVGConnectors();
         this.buildSVGConnectors();
     }
 
-    getBlockFromId(blockId: BlockId): CanvasBlockElt {
+    getBlockFromId(blockId: BlockId): CanvasBlockElt | undefined {
         const node = this.nodes.find(elt => elt.id() === blockId.nodeId);
-        return node.getBlockFromId(blockId.blockId);
+        return node?.getBlockFromId(blockId.blockId);
     }
 
-    removeBlockFromId(blockId: BlockId): CanvasBlockElt | undefined {        
+    removeBlockFromId(blockId: BlockId): CanvasBlockElt | undefined {
         const node = this.nodes.find(elt => elt.id() === blockId.nodeId);
         if (!node) {
             return undefined;
@@ -227,19 +227,16 @@ export class Canvas implements DisposeInterface {
     }
 
     private initConnectors() {
-        this.connectors = [];
-        for(const node of this.nodes) {
-            const blocks = node.getBlocks();
-            for(const block of blocks) {
-                if(block.getLink()) {
-                    this.connectors.push(Connector.fromElementsId(
-                        this,
-                        block.createBlockId(),
-                        block.getLink()
-                    ));
-                }
-            }
-        }
+        this.connectors = [].concat(...this.nodes
+            .map(node => node.getBlocks()
+                .filter(block => block.getLink())
+                .map(block => Connector.fromElementsId(
+                    this,
+                    block.createBlockId(),
+                    block.getLink()
+                ))
+                .filter(connector => connector !== undefined)
+            ));
     }
 
     private observeNodeChanges(mutationList: MutationRecord[], observer) {
@@ -252,19 +249,19 @@ export class Canvas implements DisposeInterface {
     }
 
     private removeNodesFromChanges(nodeList: NodeList) {
-        const nodesToBeRemoved = Array.from(nodeList)            
+        const nodesToBeRemoved = Array.from(nodeList)
             .filter(node => node instanceof HTMLElement);
-        for(const node of nodesToBeRemoved) {
+        for (const node of nodesToBeRemoved) {
             this.removeNodeFromElement(node);
         }
     }
 
-    private addNodesFromChanges(nodeList: NodeList) {        
+    private addNodesFromChanges(nodeList: NodeList) {
         const nodesToBeAdded = Array.from(nodeList)
             .filter(node => node instanceof HTMLElement)
-            .filter(node => node.classList.contains(CanvasIds.getCanvasNodeClassName()))                    
-            .filter(node => !this.getNodeFromElement(node));        
-        for(const node of nodesToBeAdded) {
+            .filter(node => node.classList.contains(CanvasIds.getCanvasNodeClassName()))
+            .filter(node => !this.getNodeFromElement(node));
+        for (const node of nodesToBeAdded) {
             this.addNodeFromElement(node);
         }
     }

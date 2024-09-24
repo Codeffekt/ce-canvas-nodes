@@ -11,6 +11,8 @@ export class DragAction implements DisposeInterface {
         y: 0
     };   
 
+    private wasDragged = false;
+
     constructor(
         private canvas: Canvas,
         private node: CanvasNodeElt,
@@ -33,10 +35,17 @@ export class DragAction implements DisposeInterface {
     private onDragMouseDown(event: MouseEvent) {
         this.evtProvider.onElementStartDragging();
         event.preventDefault();
+        this.wasDragged = false;
         this.mousePos.x = event.clientX;
         this.mousePos.y = event.clientY;
-        document.onmouseup = () => this.closeDragElement();
-        document.onmousemove = (event) => this.elementDrag(event);
+        document.onmouseup = () => {
+            this.closeDragElement();
+            this.wasDragged = false;
+        };
+        document.onmousemove = (event) => {
+            this.wasDragged = true;            
+            this.elementDrag(event);
+        };
     }
 
     private closeDragElement() {                  
@@ -47,7 +56,9 @@ export class DragAction implements DisposeInterface {
         );
         document.onmouseup = null;
         document.onmousemove = null;
-        this.evtProvider.onElementEndDragging();     
+        if(this.wasDragged) {
+            this.evtProvider.onElementEndDragging();     
+        }
     }
 
     private elementDrag(event: MouseEvent) {

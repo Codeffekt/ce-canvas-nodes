@@ -16,9 +16,14 @@ export class Connector {
         srcId: BlockId, 
         dstId: BlockId) {        
         
-        const connector = new Connector(
-            canvas.getBlockFromId(srcId), 
-            canvas.getBlockFromId(dstId));
+        const srcBlock = canvas.getBlockFromId(srcId);
+        const dstBlock = canvas.getBlockFromId(dstId);
+
+        if(!srcBlock || !dstBlock) {
+            return undefined;
+        }
+
+        const connector = new Connector(srcBlock, dstBlock);
 
         return connector;
     }
