@@ -1,4 +1,10 @@
-import { BlockIdUtils, Canvas, CenterElts, Connector, ExportLayout, ImportLayout, SingleRowAutoLayout, ZoomToFit } from '../dist/ce-canvas-nodes.esm.js';
+import { 
+    BlockIdUtils, Canvas, 
+    CenterElts, Connector, 
+    ExportLayout, ImportLayout, 
+    SingleRowAutoLayout, ZoomToFit,
+    LinkStyleArrow, LinkStyleSquare, 
+} from '../dist/ce-canvas-nodes.esm.js';
 
 function domify(str) {
     const el = document.createElement('div');
@@ -24,6 +30,16 @@ function addLink(canvas, src, dst) {
     const block = canvas.getBlockFromId(src);
     if (block) {
         block.nativeElement().setAttribute(Connector.ATTRIBUTE_NAME, BlockIdUtils.createLink(dst));
+    }
+}
+
+function changeLink(canvas, src) {
+    const block = canvas.getBlockFromId(src);
+    if (block) {
+        const currentStyle = block.getLinkStyle();
+        const newStyle = currentStyle === LinkStyleArrow.LINK_STYLE_NAME ? 
+        LinkStyleSquare.LINK_STYLE_NAME : LinkStyleArrow.LINK_STYLE_NAME;
+        block.nativeElement().setAttribute(Connector.ATTRIBUTE_STYLE, newStyle);
     }
 }
 
@@ -106,10 +122,13 @@ function bootstrap() {
     document.querySelector('#addNode').addEventListener('click', () => addNode(canvas));
     document.querySelector('#importLayout').addEventListener('click', () => importLayout(canvas));
     document.querySelector('#exportLayout').addEventListener('click', () => exportLayout(canvas));
+    document.querySelector('#changeLink').addEventListener('click', () => changeLink(canvas,
+        { nodeId: "elt1", blockId: "header" })
+    );
 
     document.addEventListener("drag", function (event) {
         console.log(event);
-    });    
+    });
 }
 
 bootstrap();

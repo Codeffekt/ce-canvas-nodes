@@ -88,7 +88,7 @@ export class Canvas implements DisposeInterface {
 
     updateConnectors() {
         this.initConnectors();
-        this; this.redrawConnectors();
+        this.redrawConnectors();
     }
 
     redrawConnectors() {
@@ -198,7 +198,7 @@ export class Canvas implements DisposeInterface {
                 anchorPair.a,
                 anchorPair.b,
                 id,
-                this.style);
+                this.style.getLinkStyle(connector.getLinkStyle()));
             this.connectorsContainer.appendChild(path);
         }
     }
@@ -233,7 +233,8 @@ export class Canvas implements DisposeInterface {
                 .map(block => Connector.fromElementsId(
                     this,
                     block.createBlockId(),
-                    block.getLink()
+                    block.getLink(),
+                    block.getLinkStyle(),
                 ))
                 .filter(connector => connector !== undefined)
             ));

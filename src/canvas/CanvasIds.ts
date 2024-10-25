@@ -1,12 +1,5 @@
 import { Connector } from "./Connector";
 
-const arrow_ids = {
-    "arrow": "tds_arrow",
-    "arrow_draft": "tds_arrow_draft",
-    "arrow_over": "tds_arrow_over",
-    "arrow_selected": "tds_arrow_selected"
-};
-
 export class CanvasIds {    
 
     static getAnchorClassName() {
@@ -40,8 +33,5 @@ export class CanvasIds {
     static forConnectorDraft() {
         return "canvas-connector-draft";
     }
-
-    static forArrowType(type: string) {
-        return arrow_ids[type];
-    }
+    
 }

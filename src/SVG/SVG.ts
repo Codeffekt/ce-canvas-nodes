@@ -1,5 +1,5 @@
 import { CanvasTransform } from "../canvas";
-import { CanvasIds } from "../canvas/CanvasIds";
+import { LinkStyle } from "../style";
 import { Style } from "../style/Style";
 
 export interface SVGPoint {
@@ -31,12 +31,11 @@ export class SVG {
         }        
     }
 
-    static createPath(backPoint: SVGPoint, frontPoint: SVGPoint, id: string, style: Style) {
+    static createPath(backPoint: SVGPoint, frontPoint: SVGPoint, id: string, style: LinkStyle) {
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         style.applySVGPathStyle(path);
         path.setAttributeNS(null, "id", id);
-        this.updatePath(path, backPoint, frontPoint);
-        path.setAttributeNS(null, "marker-start", "url(#" + CanvasIds.forArrowType('arrow') + ")");
+        this.updatePath(path, backPoint, frontPoint);        
         return path;
     }
 
@@ -52,11 +51,12 @@ export class SVG {
         const controlBack: SVGPoint = {
             x: backPoint.x - delta,
             y: backPoint.y
-        };
+        };        
 
-        const deltaArrow = isConnectorLeftToRight ? -10 : 10;
-
-        const d = "M" + (frontPoint.x + deltaArrow) + " " + frontPoint.y + " " + "C " + controlFront.x + " " + controlFront.y + " " + controlBack.x + " " + controlBack.y + " " + backPoint.x + " " + backPoint.y;
+        const d = "M" + frontPoint.x + " " + frontPoint.y + " " + 
+            "C " + controlFront.x + " " + controlFront.y + " " + 
+            controlBack.x + " " + controlBack.y + " " + backPoint.x + " " + backPoint.y;
+            
         path.setAttributeNS(null, "d", d);
     }
 

@@ -11,10 +11,12 @@ export class CanvasBlockElt implements DisposeInterface {
     private anchors: HTMLElement[] = [];
     private observer: MutationObserver;
     private link?: BlockId;
+    private linkStyle = Connector.DEFAULT_LINK_STYLE;
 
     constructor(private src: HTMLElement, private parent: CanvasNodeElt) {
         this.retrieveAnchorsElements();
         this.retrieveLink();
+        this.retrieveLinkStyle();
         this.createObserver();
         this.createActions();
     }
@@ -54,6 +56,10 @@ export class CanvasBlockElt implements DisposeInterface {
         return this.link;
     }
 
+    getLinkStyle() {
+        return this.linkStyle;
+    }
+
     updateLink(dst: BlockId) {
         this.src.setAttribute(Connector.ATTRIBUTE_NAME, BlockIdUtils.createLink(dst));
     }
@@ -67,6 +73,11 @@ export class CanvasBlockElt implements DisposeInterface {
         this.link = attribute ? BlockIdUtils.createFromLink(attribute) : null;
     }
 
+    private retrieveLinkStyle() {
+        const attribute = this.src.getAttribute(Connector.ATTRIBUTE_STYLE);        
+        this.linkStyle = attribute ?? Connector.DEFAULT_LINK_STYLE;        
+    }
+
     private createActions() {
         new CreateConnectorAction(this, CreateConnectorEvent.forCanvasBlockElt(this));
         new SelectionAction(this.src, SelectionEvent.forCanvasBlock(this));
@@ -75,10 +86,14 @@ export class CanvasBlockElt implements DisposeInterface {
     private observeNodeChanges(mutationList: MutationRecord[], observer) {
         for (const mutation of mutationList) {
             if (mutation.type === "attributes" &&
-                mutation.target === this.src &&
-                mutation.attributeName === Connector.ATTRIBUTE_NAME) {                
-                this.retrieveLink();                
-                this.parent.getCanvas().updateConnectors();
+                mutation.target === this.src) {
+                if (mutation.attributeName === Connector.ATTRIBUTE_NAME) {
+                    this.retrieveLink();
+                    this.parent.getCanvas().updateConnectors();
+                } else if(mutation.attributeName === Connector.ATTRIBUTE_STYLE) {
+                    this.retrieveLinkStyle();
+                    this.parent.getCanvas().updateConnectors();
+                }                                   
             }
         }
     }

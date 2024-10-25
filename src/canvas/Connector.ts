@@ -6,15 +6,24 @@ import { BlockId } from "./BlockId";
 
 export class Connector {    
 
-    static ATTRIBUTE_NAME = "link";
+    static ATTRIBUTE_NAME = "link";    
+    static ATTRIBUTE_STYLE = "link-style";
 
-    constructor(private src: CanvasBlockElt, private dst: CanvasBlockElt) {        
+    static DEFAULT_LINK_STYLE = "arrow";
+
+    constructor(
+        private src: CanvasBlockElt, 
+        private dst: CanvasBlockElt,
+        private linkStyle: string,
+    ) {        
     }
 
     static fromElementsId(
         canvas: Canvas,
         srcId: BlockId, 
-        dstId: BlockId) {        
+        dstId: BlockId,
+        linkStyle: string,
+    ) {        
         
         const srcBlock = canvas.getBlockFromId(srcId);
         const dstBlock = canvas.getBlockFromId(dstId);
@@ -23,7 +32,7 @@ export class Connector {
             return undefined;
         }
 
-        const connector = new Connector(srcBlock, dstBlock);
+        const connector = new Connector(srcBlock, dstBlock, linkStyle);
 
         return connector;
     }
@@ -42,5 +51,9 @@ export class Connector {
 
     getDst() {
         return this.dst;
+    }
+
+    getLinkStyle() {
+        return this.linkStyle;
     }
 }

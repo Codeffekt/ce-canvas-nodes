@@ -1,31 +1,61 @@
 import { CanvasIds } from "../canvas";
 import { GroupElement } from "../SVG";
-import { MarkerElement } from "../SVG/MarkerElement";
-import { MarkerElementStyle } from "./MarkerElementStyle";
+import { LinkStyle, LinkStyleFactory } from "./LinkStyle";
+import { LinkStyleArrow } from "./LinkStyleArrow";
+import { LinkStyleSquare } from "./LinkStyleCircle";
+import { Markers } from "./Markers";
 
 export class Style {
 
-    private svgContainerId = "tds_svgContainer";
-    private svgConnectorsId = "tds_svgConnectors";
+    private svgContainerId = "ce_canvas_svgContainer";
+    private svgConnectorsId = "ce_canvas_svgConnectors";
 
     private classes = {
-        "connector_selected": "tds_connector_selected",
-        "input_block": "tds_input_block",
-        "connectable": "tds_connectable",
-        "connector": "tds_connector",
-        "connector_over": "tds_connector_over",
-        "path": "tds_path",
-        "connector_draft": "tds_connector_draft",
+        "connector_selected": "ce_canvas_connector_selected",
+        "input_block": "ce_canvas_input_block",
+        "connectable": "ce_canvas_connectable",
+        "connector": "ce_canvas_connector",
+        "connector_over": "ce_canvas_connector_over",
+        "path": "ce_canvas_path",
+        "connector_draft": "ce_canvas_connector_draft",
     };
 
     private colors = {
-        "black": "black",
-        "gray": "gray",
-        "blue": "#3ea9f5"
+        "fill": "#ffffff",
+        "fill-draft": "#898E99",
+        "fill-over": "#898E99",
+        "fill-selected": "#898E99",
+        "stroke": "#898E99",
+        "stroke-draft": "#898E99",
+        "stroke-over": "#898E99",
+        "stroke-selected": "#898E99",        
     };
+
+    private linkStyleFactory: LinkStyleFactory = {
+        [LinkStyleArrow.LINK_STYLE_NAME]: new LinkStyleArrow(),
+        [LinkStyleSquare.LINK_STYLE_NAME]: new LinkStyleSquare(),
+    };
+
+    private defaultLinkStyle = LinkStyleArrow.LINK_STYLE_NAME;
 
     constructor() {
 
+    }
+
+    getLinkStyle(linkStyle: string): LinkStyle {
+        return this.linkStyleFactory[linkStyle] ?? this.linkStyleFactory[this.defaultLinkStyle];
+    }
+
+    getColor(id: string) {
+        return this.colors[id];
+    }
+
+    getClass(id: string) {
+        return this.classes[id];
+    }
+
+    getStrokeWidth() {
+        return "2";
     }
 
     applyRootStyle(root: HTMLElement|SVGElement) {
@@ -45,22 +75,15 @@ export class Style {
     }
 
     createMarkerElements(): SVGMarkerElement[] {
-        const markerElementStyles: MarkerElementStyle[] = [
-            { id: CanvasIds.forArrowType('arrow'), fill: this.colors['black'], class: this.classes['connector'] },
-            { id: CanvasIds.forArrowType('arrow_draft'), fill: this.colors['gray'], class: this.classes['connector_draft'] },
-            { id: CanvasIds.forArrowType('arrow_over'), fill: this.colors['gray'], class: this.classes['connector_over'] },
-            { id: CanvasIds.forArrowType('arrow_selected'), fill: this.colors['blue'], class: this.classes['connector_selected'] }
-        ];
-        return markerElementStyles
-            .map(markerElementStyle => MarkerElement.createElementFromStyle(markerElementStyle));
+        return Markers.createMarkerElements(this);
     }
 
     createConnectorsGroupElement() {
         return GroupElement.createElementFromStyle({
             id: this.getSVGConnectorsId(),
             fill: "white",
-            stroke: "black",
-            "stroke-width": "2",
+            stroke: this.getColor("stroke"),
+            "stroke-width": this.getStrokeWidth(),
         });
     }
 
@@ -68,8 +91,8 @@ export class Style {
         return GroupElement.createElementFromStyle({
             id: CanvasIds.forDraftGroup(),
             fill: "white",
-            stroke: "black",
-            "stroke-width": "2",
+            stroke: this.getColor("stroke"),
+            "stroke-width": this.getStrokeWidth(),
         });
     }
 

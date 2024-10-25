@@ -63,24 +63,24 @@ body {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
 }
 
-#canvas-left-anchor {
-    position: relative;
-    left: -5px;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    background-color: blue;
+.canvas-anchor {
+    background-color: none;
+    display: block;
+    width: 16px;
+    height: 16px;
 }
 
-#canvas-right-anchor {
+.left-anchor {
     position: relative;
-    right: -5px;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    background-color: blue;
+    left: -8px;
+}
+
+.right-anchor {
+    position: relative;
+    right: -8px;
 }
 
 #elt1 {    
@@ -113,4 +113,8 @@ body {
 
 #block3 {
     background-color: blueviolet;
+}
+
+.connector {
+    stroke: #898E99;
 }

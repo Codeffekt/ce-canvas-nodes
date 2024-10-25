@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Ce Canvas Nodes Démo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="main.css">
+</head>
+
+<body>
+
+
+    <svg version="1.1" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <marker id="ce_canvas_circle" 
+                markerWidth="16" markerHeight="16" 
+                refX="14" refY="8" markerUnits="userSpaceOnUse"
+                orient="auto">
+                <circle fill="#ffffff9e" class="ce_canvas_connector" 
+                    r="6" cx="8" cy="8" 
+                    stroke-width="2" stroke="#898E99">
+                </circle>
+            </marker>
+            <marker id="ce_canvas_rectangle"
+                markerWidth="16" markerHeight="16"
+                refX="1" refY="10" markerUnits="userSpaceOnUse"
+                orient="45">
+                <rect fill="#ffffff9e" class="ce_canvas_connector"
+                    width="10" height="10"
+                    stroke-width="2" stroke="#898E99"></rect>
+            </marker>
+        </defs>
+        <g id="ce_canvas_svgConnectors" fill="white" stroke="#898E99" stroke-width="2">
+            <path fill="transparent" class="connector"
+                d="M820 136 C 1009 136 713 230 913 230"
+                marker-start="url(#ce_canvas_circle)" marker-end="url(#ce_canvas_rectangle)">
+            </path>
+        </g>
+    </svg>
+
+</body>
+
+</html>

@@ -98,7 +98,7 @@ export class CreateConnectorAction {
             this.connectorPoints.a,
             this.connectorPoints.b,
             id,
-            this.style
+            this.style.getLinkStyle(this.block.getLinkStyle()),
         );
 
         this.draftContainer.appendChild(this.draftPath);
@@ -107,7 +107,11 @@ export class CreateConnectorAction {
     }
 
     private connectorOnBlock(dstBlock: CanvasBlockElt) {
-        this.newConnector = new Connector(this.block, dstBlock);
+        this.newConnector = new Connector(
+            this.block,
+            dstBlock,
+            this.block.getLinkStyle()
+        );
         const anchorPair = PathBuilder.findBestAnchorPoints(
             this.canvas,
             this.block,
