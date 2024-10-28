@@ -1,5 +1,8 @@
 # Changelog for @codeffekt/ce-canvas-nodes
 
+## [0.0.8]
+ - add link direction attribute
+
 ## [0.0.7]
  - add link style attribute
  - add a set of markers

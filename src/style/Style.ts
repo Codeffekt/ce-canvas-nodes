@@ -2,7 +2,7 @@ import { CanvasIds } from "../canvas";
 import { GroupElement } from "../SVG";
 import { LinkStyle, LinkStyleFactory } from "./LinkStyle";
 import { LinkStyleArrow } from "./LinkStyleArrow";
-import { LinkStyleSquare } from "./LinkStyleCircle";
+import { LinkStyleSquare } from "./LinkStyleSquare";
 import { Markers } from "./Markers";
 
 export class Style {

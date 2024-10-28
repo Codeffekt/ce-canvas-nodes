@@ -187,10 +187,15 @@ export class Canvas implements DisposeInterface {
 
     private buildSVGConnectors() {
         for (let connector of this.connectors) {
+
+            const linkDirection = connector.isLinkBackward() ?
+                { src: connector.getDst(), dst: connector.getSrc() } :
+                { src: connector.getSrc(), dst: connector.getDst() };
+
             const anchorPair = PathBuilder.findBestAnchorPoints(
                 this,
-                connector.getSrc(),
-                connector.getDst()
+                linkDirection.src,
+                linkDirection.dst,
             );
 
             const id = CanvasIds.forConnector(connector);
@@ -233,8 +238,7 @@ export class Canvas implements DisposeInterface {
                 .map(block => Connector.fromElementsId(
                     this,
                     block.createBlockId(),
-                    block.getLink(),
-                    block.getLinkStyle(),
+                    block.getLink(),                    
                 ))
                 .filter(connector => connector !== undefined)
             ));

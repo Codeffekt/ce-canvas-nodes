@@ -109,8 +109,7 @@ export class CreateConnectorAction {
     private connectorOnBlock(dstBlock: CanvasBlockElt) {
         this.newConnector = new Connector(
             this.block,
-            dstBlock,
-            this.block.getLinkStyle()
+            dstBlock,            
         );
         const anchorPair = PathBuilder.findBestAnchorPoints(
             this.canvas,

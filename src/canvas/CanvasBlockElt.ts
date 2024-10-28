@@ -4,7 +4,7 @@ import { CreateConnectorEvent, SelectionEvent } from "../events";
 import { BlockId, BlockIdUtils } from "./BlockId";
 import { CanvasIds } from "./CanvasIds";
 import { CanvasNodeElt } from "./CanvasNodeElt";
-import { Connector } from "./Connector";
+import { Connector, ConnectorDirection } from "./Connector";
 
 export class CanvasBlockElt implements DisposeInterface {
 
@@ -12,11 +12,13 @@ export class CanvasBlockElt implements DisposeInterface {
     private observer: MutationObserver;
     private link?: BlockId;
     private linkStyle = Connector.DEFAULT_LINK_STYLE;
+    private linkDirection = Connector.DEFAULT_LINK_DIRECTION;
 
     constructor(private src: HTMLElement, private parent: CanvasNodeElt) {
         this.retrieveAnchorsElements();
         this.retrieveLink();
         this.retrieveLinkStyle();
+        this.retrieveLinkDirection();
         this.createObserver();
         this.createActions();
     }
@@ -60,6 +62,10 @@ export class CanvasBlockElt implements DisposeInterface {
         return this.linkStyle;
     }
 
+    getLinkDirection() {
+        return this.linkDirection;
+    }    
+
     updateLink(dst: BlockId) {
         this.src.setAttribute(Connector.ATTRIBUTE_NAME, BlockIdUtils.createLink(dst));
     }
@@ -78,6 +84,11 @@ export class CanvasBlockElt implements DisposeInterface {
         this.linkStyle = attribute ?? Connector.DEFAULT_LINK_STYLE;        
     }
 
+    private retrieveLinkDirection() {
+        const attribute = this.src.getAttribute(Connector.ATTRIBUTE_DIRECTION) as ConnectorDirection;        
+        this.linkDirection = attribute ?? Connector.DEFAULT_LINK_DIRECTION;        
+    }
+
     private createActions() {
         new CreateConnectorAction(this, CreateConnectorEvent.forCanvasBlockElt(this));
         new SelectionAction(this.src, SelectionEvent.forCanvasBlock(this));
@@ -93,7 +104,10 @@ export class CanvasBlockElt implements DisposeInterface {
                 } else if(mutation.attributeName === Connector.ATTRIBUTE_STYLE) {
                     this.retrieveLinkStyle();
                     this.parent.getCanvas().updateConnectors();
-                }                                   
+                } else if(mutation.attributeName === Connector.ATTRIBUTE_DIRECTION) {
+                    this.retrieveLinkDirection();
+                    this.parent.getCanvas().updateConnectors();
+                }
             }
         }
     }

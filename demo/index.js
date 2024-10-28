@@ -43,6 +43,16 @@ function changeLink(canvas, src) {
     }
 }
 
+function changeDirection(canvas, src) {
+    const block = canvas.getBlockFromId(src);
+    if (block) {
+        const currentDirection = block.getLinkDirection();
+        const newDirection = currentDirection === Connector.DIRECTION_FORWARD ? 
+        Connector.DIRECTION_BACKWARD : Connector.DIRECTION_FORWARD;
+        block.nativeElement().setAttribute(Connector.ATTRIBUTE_DIRECTION, newDirection);
+    }
+}
+
 function updateLink(canvas, src, dst) {
     addLink(canvas, src, dst);
 }
@@ -123,6 +133,10 @@ function bootstrap() {
     document.querySelector('#importLayout').addEventListener('click', () => importLayout(canvas));
     document.querySelector('#exportLayout').addEventListener('click', () => exportLayout(canvas));
     document.querySelector('#changeLink').addEventListener('click', () => changeLink(canvas,
+        { nodeId: "elt1", blockId: "header" })
+    );
+
+    document.querySelector('#changeDirection').addEventListener('click', () => changeDirection(canvas,
         { nodeId: "elt1", blockId: "header" })
     );
 
