@@ -1,6 +1,7 @@
 # Changelog for @codeffekt/ce-canvas-nodes
 
 ## [0.0.8]
+ - link & connector styles
  - add link direction attribute
 
 ## [0.0.7]
