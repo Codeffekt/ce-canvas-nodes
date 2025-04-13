@@ -31,16 +31,13 @@ export class TranslateAction {
     private createEventListeners() {
 
         this.canvas.getContainer().addEventListener("mousedown", (event: MouseEvent) => {
-            this.onDragMouseDown(event);
+            if (this.canvas.getActions().translateActionMouseDownFn(event)) {
+                this.onDragMouseDown(event);
+            }
         });
     }
 
-    private onDragMouseDown(event: MouseEvent) {
-
-        if (event.button !== 1) {
-            return false;
-        }
-        
+    private onDragMouseDown(event: MouseEvent) {        
         this.isDragging = true;
         event.preventDefault();
 

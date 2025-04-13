@@ -9,7 +9,7 @@ export class DragAction implements DisposeInterface {
     private mousePos: Vector2 = {
         x: 0,
         y: 0
-    };   
+    };
 
     private wasDragged = false;
 
@@ -27,7 +27,9 @@ export class DragAction implements DisposeInterface {
     private createEventListeners() {
 
         this.node.getElement().addEventListener("mousedown", (event: MouseEvent) => {
-            this.onDragMouseDown(event);
+            if (this.canvas.getActions().dragActionMouseDownFn(event)) {
+                this.onDragMouseDown(event);
+            }
         });
 
     }
@@ -43,21 +45,21 @@ export class DragAction implements DisposeInterface {
             this.wasDragged = false;
         };
         document.onmousemove = (event) => {
-            this.wasDragged = true;            
+            this.wasDragged = true;
             this.elementDrag(event);
         };
     }
 
-    private closeDragElement() {                  
+    private closeDragElement() {
         this.node.setCoords(
             CoordsUtils.elementOffsetToCanvasCoordsNorm(
-                this.canvas, 
+                this.canvas,
                 this.node.getElement())
         );
         document.onmouseup = null;
         document.onmousemove = null;
-        if(this.wasDragged) {
-            this.evtProvider.onElementEndDragging();     
+        if (this.wasDragged) {
+            this.evtProvider.onElementEndDragging();
         }
     }
 
@@ -67,7 +69,7 @@ export class DragAction implements DisposeInterface {
             {
                 x: this.mousePos.x - event.clientX,
                 y: this.mousePos.y - event.clientY
-            });        
+            });
         this.mousePos.x = event.clientX;
         this.mousePos.y = event.clientY;
         const nodeOffsetCoords = {

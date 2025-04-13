@@ -1,9 +1,9 @@
-import { 
-    BlockIdUtils, Canvas, 
-    CenterElts, Connector, 
-    ExportLayout, ImportLayout, 
+import {
+    BlockIdUtils, Canvas,
+    CenterElts, Connector,
+    ExportLayout, ImportLayout,
     SingleRowAutoLayout, ZoomToFit,
-    LinkStyleArrow, LinkStyleSquare, 
+    LinkStyleArrow, LinkStyleSquare,
 } from '../dist/ce-canvas-nodes.esm.js';
 
 function domify(str) {
@@ -37,8 +37,8 @@ function changeLink(canvas, src) {
     const block = canvas.getBlockFromId(src);
     if (block) {
         const currentStyle = block.getLinkStyle();
-        const newStyle = currentStyle === LinkStyleArrow.LINK_STYLE_NAME ? 
-        LinkStyleSquare.LINK_STYLE_NAME : LinkStyleArrow.LINK_STYLE_NAME;
+        const newStyle = currentStyle === LinkStyleArrow.LINK_STYLE_NAME ?
+            LinkStyleSquare.LINK_STYLE_NAME : LinkStyleArrow.LINK_STYLE_NAME;
         block.nativeElement().setAttribute(Connector.ATTRIBUTE_STYLE, newStyle);
     }
 }
@@ -47,8 +47,8 @@ function changeDirection(canvas, src) {
     const block = canvas.getBlockFromId(src);
     if (block) {
         const currentDirection = block.getLinkDirection();
-        const newDirection = currentDirection === Connector.DIRECTION_FORWARD ? 
-        Connector.DIRECTION_BACKWARD : Connector.DIRECTION_FORWARD;
+        const newDirection = currentDirection === Connector.DIRECTION_FORWARD ?
+            Connector.DIRECTION_BACKWARD : Connector.DIRECTION_FORWARD;
         block.nativeElement().setAttribute(Connector.ATTRIBUTE_DIRECTION, newDirection);
     }
 }
@@ -112,7 +112,13 @@ function bootstrap() {
         throw new Error("Missing container with canvas id");
     }
 
-    const canvas = new Canvas(root);
+    const canvas = new Canvas({
+        container: root,
+        actions: {
+            dragActionMouseDownFn: (event) => (event.button === 0 && event.getModifierState("Control")) || event.button === 1,
+            translateActionMouseDownFn: (event) => event.button === 0 && !event.getModifierState("Control"),
+        }
+    });
 
     const LOCAL_STORAGE_KEY = "ce-canvas-nodes-demo";
 

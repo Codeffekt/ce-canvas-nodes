@@ -1,5 +1,8 @@
 # Changelog for @codeffekt/ce-canvas-nodes
 
+## [0.0.9]
+ - add canvas actions configuration to change MouseEvent logic for drag & translation
+
 ## [0.0.8]
  - link & connector styles
  - add link direction attribute

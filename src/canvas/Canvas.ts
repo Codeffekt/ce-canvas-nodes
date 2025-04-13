@@ -9,11 +9,17 @@ import { PathBuilder } from "../SVG";
 import { SVG } from "../SVG/SVG";
 import { HTMLUtils } from "../utils";
 import { BlockId } from "./BlockId";
+import { CanvasActions } from "./CanvasActions";
 import { CanvasBlockElt } from "./CanvasBlockElt";
 import { CanvasIds } from "./CanvasIds";
 import { CanvasNodeElt } from "./CanvasNodeElt";
 import { CanvasTransform } from "./CanvasTransform";
 import { Connector } from "./Connector";
+
+export interface CanvasConfig {
+    container: HTMLElement;
+    actions?: CanvasActions;
+}
 
 export class Canvas implements DisposeInterface {
 
@@ -31,8 +37,13 @@ export class Canvas implements DisposeInterface {
         },
         scale: 1,
     };
+    private actions: CanvasActions = {
+        dragActionMouseDownFn: (event: MouseEvent) => true,
+        translateActionMouseDownFn: (event: MouseEvent) => event.button === 1,
+    };
 
-    constructor(private canvasContainer: HTMLElement) {
+    constructor(private config: CanvasConfig) {
+        this.actions = config.actions ?? this.actions;
         this.initCanvasNodesContainer();
         this.initCanvasNodes();
         this.initConnectors();
@@ -40,6 +51,10 @@ export class Canvas implements DisposeInterface {
         this.initEventListeners();
         this.createObserver();
         this.createActions();
+    }
+
+    getActions() {
+        return this.actions;
     }
 
     dispose() {
@@ -57,8 +72,8 @@ export class Canvas implements DisposeInterface {
         this.nodes.push(node);
         this.updateConnectors();
         return node;
-    }
-
+    }            
+    
     getNodes() {
         return this.nodes;
     }
@@ -119,7 +134,7 @@ export class Canvas implements DisposeInterface {
     }
 
     getContainer() {
-        return this.canvasContainer;
+        return this.config.container;
     }
 
     getNodesContainer() {
@@ -144,11 +159,11 @@ export class Canvas implements DisposeInterface {
 
     applyAutoLayout(autoLayout: AutoLayout, config?: AutoLayoutConfig) {
         autoLayout.autoLayout(this, config);
-    }
+    }    
 
     private retrieveNodesContainer() {
         this.nodesContainer = HTMLUtils.findFirstChildWithClass(
-            this.canvasContainer,
+            this.getContainer(),
             CanvasIds.getCanvasNodesClassName());
         if (!this.nodesContainer) {
             throw new Error(`Missing nodes elements with class ${CanvasIds.getCanvasNodesClassName()}`);
