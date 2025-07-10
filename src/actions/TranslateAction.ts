@@ -30,7 +30,7 @@ export class TranslateAction {
 
     private createEventListeners() {
 
-        this.canvas.getContainer().addEventListener("mousedown", (event: MouseEvent) => {
+        this.canvas.getContainer().addEventListener("mousedown", (event: MouseEvent) => {            
             if (this.canvas.getActions().translateActionMouseDownFn(event)) {
                 this.onDragMouseDown(event);
             }
@@ -38,7 +38,7 @@ export class TranslateAction {
     }
 
     private onDragMouseDown(event: MouseEvent) {        
-        this.isDragging = true;
+        this.isDragging = true;        
         event.preventDefault();
 
         this.client.x = event.clientX;

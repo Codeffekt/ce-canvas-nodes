@@ -26,7 +26,7 @@ export class DragAction implements DisposeInterface {
 
     private createEventListeners() {
 
-        this.node.getElement().addEventListener("mousedown", (event: MouseEvent) => {
+        this.node.getElement().addEventListener("mousedown", (event: MouseEvent) => {            
             if (this.canvas.getActions().dragActionMouseDownFn(event)) {
                 this.onDragMouseDown(event);
             }
@@ -35,8 +35,9 @@ export class DragAction implements DisposeInterface {
     }
 
     private onDragMouseDown(event: MouseEvent) {
-        this.evtProvider.onElementStartDragging();
+        this.evtProvider.onElementStartDragging();        
         event.preventDefault();
+        event.stopPropagation();
         this.wasDragged = false;
         this.mousePos.x = event.clientX;
         this.mousePos.y = event.clientY;
