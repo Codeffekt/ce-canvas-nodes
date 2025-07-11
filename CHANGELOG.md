@@ -1,5 +1,8 @@
 # Changelog for @codeffekt/ce-canvas-nodes
 
+## [0.0.10]
+ - fix : cancel mouse drag event propagation
+
 ## [0.0.9]
  - add canvas actions configuration to change MouseEvent logic for drag & translation
 
